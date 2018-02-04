@@ -6,6 +6,6 @@ defmodule CatalogApi do
   end
 
   def generate_uuid do
-    "b93cee9d-dd04-4154-9b5a-8768971e72b8"
+    UUID.uuid4()
   end
 end
