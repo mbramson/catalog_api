@@ -1,4 +1,4 @@
-defmodule CatalogApi.Checksum do
+defmodule CatalogApi.Credentials do
 
   def generate_checksum(method_name, uuid, iso_8601_datetime) do
     message = method_name <> uuid <> iso_8601_datetime

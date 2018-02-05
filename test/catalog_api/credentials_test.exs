@@ -1,7 +1,7 @@
-defmodule CatalogApi.ChecksumTest do
+defmodule CatalogApi.CredentialsTest do
   use ExUnit.Case
-  doctest CatalogApi.Checksum
-  alias CatalogApi.Checksum
+  doctest CatalogApi.Credentials
+  alias CatalogApi.Credentials
 
   describe "generate_checksum" do
     test 'generates the correct checksum' do
@@ -9,7 +9,7 @@ defmodule CatalogApi.ChecksumTest do
       uuid = "b93cee9d-dd04-4154-9b5a-8768971e72b8"
       datetime = "2013-01-01T01:30:00Z"
 
-      assert Checksum.generate_checksum(method_name, uuid, datetime) == "VdMhe0wbSyIYeymMm2YvuCmK0vE="
+      assert Credentials.generate_checksum(method_name, uuid, datetime) == "VdMhe0wbSyIYeymMm2YvuCmK0vE="
     end
   end
 end
