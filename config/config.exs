@@ -7,4 +7,7 @@ use Mix.Config
 # for another project, you will need to specify this config in that project's
 # config.exs file.
 
-config :catalog_api, secret_key: System.get_env("CATALOG_API_SECRET_KEY")
+config :catalog_api,
+  secret_key: System.get_env("CATALOG_API_SECRET_KEY"),
+  username: System.get_env("CATALOG_API_USERNAME"),
+  environment: "dev"
