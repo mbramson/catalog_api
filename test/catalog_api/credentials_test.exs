@@ -9,7 +9,7 @@ defmodule CatalogApi.CredentialsTest do
     test "returns the proper credential tuple" do
       assert %{creds_datetime: datetime, creds_uuid: uuid, creds_checksum: checksum} =
         Credentials.creds_for_request("view_item")
-      assert is_iso8601_datetime_string(datetime)
+      assert :ok = is_iso8601_datetime_string(datetime)
       assert is_valid_uuid(uuid)
       assert :ok = is_valid_checksum(checksum)
     end
@@ -18,7 +18,7 @@ defmodule CatalogApi.CredentialsTest do
   describe "current_iso_8601_datetime/0" do
     test "returns an ISO-8601 formatted datetime" do
       datetime = Credentials.current_iso_8601_datetime
-      assert is_iso8601_datetime_string(datetime)
+      assert :ok = is_iso8601_datetime_string(datetime)
     end
   end
 
