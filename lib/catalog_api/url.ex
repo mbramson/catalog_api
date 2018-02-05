@@ -2,8 +2,9 @@ defmodule CatalogApi.Url do
   alias CatalogApi.Credentials
 
   def url_for(method, extra_params \\ %{}) do
-    cred_params = credential_params(method)
-    encoded_params = cred_params <> URI.encode_query(extra_params)
+    cred_params = method |> Credentials.creds_for_request
+    params = extra_params |> Map.merge(cred_params)
+    encoded_params = URI.encode_query(params)
     base_url(method) <> "?" <> encoded_params
   end
 
@@ -35,14 +36,5 @@ defmodule CatalogApi.Url do
         """
     end
     {username, environment}
-  end
-
-  defp validate_username_and_environment(username, environment) do
-  end
-
-  def credential_params(method) do
-    method
-    |> Credentials.creds_for_request
-    |> URI.encode_query
   end
 end

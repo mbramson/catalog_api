@@ -8,19 +8,25 @@ defmodule CatalogApi.UrlTest do
   describe "url_for/2" do
     test "produces correct url with no extra parameters" do
       url = Url.url_for("view_cart")
+      [base_url, params] = url |> String.split("?")
+      assert base_url == "https://test-user.dev.catalogapi.com/v1/rest/view_cart"
+      decoded_params = URI.decode_query(params)
+      assert :ok = decoded_params["creds_checksum"] |> is_valid_checksum
+      assert :ok = decoded_params["creds_datetime"] |> is_iso8601_datetime_string
+      assert :ok = decoded_params["creds_uuid"] |> is_valid_uuid
     end
-  end
 
-  describe "credential_params/1" do
-    test "builds properly formatted params" do
-      params = Url.credential_params("view_cart")
-      assert [checksum_param, datetime_param, uuid_param] = params |> String.split("&")
-      assert ["creds_checksum", checksum] = checksum_param |> String.split("=")
-      assert :ok = checksum |> is_valid_checksum
-      assert ["creds_datetime", datetime] = datetime_param |> String.split("=")
-      assert :ok = datetime |> is_iso8601_datetime_string
-      assert ["creds_uuid", uuid] = uuid_param |> String.split("=")
-      assert :ok = uuid |> is_valid_uuid
+    test "produces correct url with extra parameters" do
+      extra_params = %{socket_id: "123", catalog_item_id: "456"}
+      url = Url.url_for("view_item", extra_params)
+      [base_url, params] = url |> String.split("?")
+      assert base_url == "https://test-user.dev.catalogapi.com/v1/rest/view_item"
+      decoded_params = URI.decode_query(params)
+      assert :ok = decoded_params["creds_checksum"] |> is_valid_checksum
+      assert :ok = decoded_params["creds_datetime"] |> is_iso8601_datetime_string
+      assert :ok = decoded_params["creds_uuid"] |> is_valid_uuid
+      assert "123" == decoded_params["socket_id"]
+      assert "456" == decoded_params["catalog_item_id"]
     end
   end
 
