@@ -24,8 +24,8 @@ defmodule CatalogApi.FormatHelper do
 
   def is_valid_uuid(uuid) do
     case UUID.info(uuid) do
-      {:ok, _} -> true
-      _        -> false
+      {:ok, _} -> :ok
+      error    -> error
     end
   end
 

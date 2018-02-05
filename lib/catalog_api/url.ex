@@ -2,8 +2,9 @@ defmodule CatalogApi.Url do
   alias CatalogApi.Credentials
 
   def credential_params(method) do
-    {datetime, uuid, checksum} = Credentials.creds_for_request(method)
-    "creds_datetime=#{datetime}&creds_uuid=#{uuid}&creds_checksum=#{checksum}"
+    method
+    |> Credentials.creds_for_request
+    |> URI.encode_query
   end
 
   def base_url do

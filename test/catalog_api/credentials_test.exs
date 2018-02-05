@@ -10,7 +10,7 @@ defmodule CatalogApi.CredentialsTest do
       assert %{creds_datetime: datetime, creds_uuid: uuid, creds_checksum: checksum} =
         Credentials.creds_for_request("view_item")
       assert :ok = is_iso8601_datetime_string(datetime)
-      assert is_valid_uuid(uuid)
+      assert :ok = is_valid_uuid(uuid)
       assert :ok = is_valid_checksum(checksum)
     end
   end
@@ -24,7 +24,7 @@ defmodule CatalogApi.CredentialsTest do
 
   describe "generate_uuid/0" do
     test "returns a valid uuid" do
-      assert Credentials.generate_uuid |> is_valid_uuid
+      assert :ok = Credentials.generate_uuid |> is_valid_uuid
     end
   end
 

@@ -3,11 +3,18 @@ defmodule CatalogApi.UrlTest do
   doctest CatalogApi.Url
 
   alias CatalogApi.Url
+  import CatalogApi.FormatHelper
 
   describe "credential_params/1" do
     test "builds properly formatted params" do
       params = Url.credential_params("view_cart")
-      assert [datetime, uuid, checksum] = params |> String.split("&")
+      assert [checksum_param, datetime_param, uuid_param] = params |> String.split("&")
+      assert ["creds_checksum", checksum] = checksum_param |> String.split("=")
+      assert :ok = checksum |> is_valid_checksum
+      assert ["creds_datetime", datetime] = datetime_param |> String.split("=")
+      assert :ok = datetime |> is_iso8601_datetime_string
+      assert ["creds_uuid", uuid] = uuid_param |> String.split("=")
+      assert :ok = uuid |> is_valid_uuid
     end
   end
 
