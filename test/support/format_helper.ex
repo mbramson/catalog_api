@@ -22,8 +22,9 @@ defmodule CatalogApi.FormatHelper do
 
   def is_valid_checksum(checksum) do
     case checksum do
-      <<_chars::bytes-size(27)>> <> "=" -> true
-      _ -> false
+      <<_chars::bytes-size(27)>> <> "=" -> :ok
+      <<_chars::bytes-size(27)>> <> "%3D" -> :ok
+      _ -> {:invalid_checksum, checksum}
     end
   end
 end

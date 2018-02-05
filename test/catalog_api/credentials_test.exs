@@ -11,7 +11,7 @@ defmodule CatalogApi.CredentialsTest do
         Credentials.creds_for_request("view_item")
       assert is_iso8601_datetime_string(datetime)
       assert is_valid_uuid(uuid)
-      assert is_valid_checksum(checksum)
+      assert :ok = is_valid_checksum(checksum)
     end
   end
 
@@ -40,7 +40,7 @@ defmodule CatalogApi.CredentialsTest do
     test "generates valid checksum for random input" do
       ptest [method: string(), uuid: string(), datetime: string()] do
         checksum = Credentials.generate_checksum(method, uuid, datetime)
-        assert is_valid_checksum(checksum)
+        assert :ok = is_valid_checksum(checksum)
       end
     end
   end
