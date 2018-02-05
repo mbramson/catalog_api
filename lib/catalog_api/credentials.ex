@@ -5,10 +5,10 @@ defmodule CatalogApi.Credentials do
   provide credentials to make and authenticated request to CatalogApi.
   """
   @spec creds_for_request(String.t) :: {String.t, String.t, Strin.t}
-  def creds_for_request(method) do
+  def creds_for_request(method) when is_binary(method) do
     creds_datetime = current_iso_8601_datetime()
     creds_uuid     = generate_uuid()
-    creds_checksum = Checksum.generate_checksum(method, creds_uuid, creds_datetime)
+    creds_checksum = generate_checksum(method, creds_uuid, creds_datetime)
     {creds_datetime, creds_uuid, creds_checksum}
   end
 
