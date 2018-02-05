@@ -3,6 +3,14 @@ defmodule CatalogApi.Credentials do
   @doc """
   Produces a tuple containing the uuid, datetime, and checksum necessary to
   provide credentials to make and authenticated request to CatalogApi.
+
+  Note that the output for this function will depend on the secret key set in
+  the configuration for :catalog_api. The output will also depend on the
+  current time and the randomly generated uuid.
+
+  ## Examples
+      iex> Credentials.creds_for_request("view_cart")
+      {"2013-01-01T01:30:00Z", "b93cee9d-dd04-4154-9b5a-8768971e72b8", "VdMhe0wbSyIYeymMm2YvuCmK0vE="}
   """
   @spec creds_for_request(String.t) :: {String.t, String.t, Strin.t}
   def creds_for_request(method) when is_binary(method) do

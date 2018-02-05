@@ -1,7 +1,7 @@
 defmodule CatalogApi.CredentialsTest do
   use ExUnit.Case
   use Quixir
-  doctest CatalogApi.Credentials
+  doctest CatalogApi.Credentials, except: [creds_for_request: 1]
   alias CatalogApi.Credentials
 
   def assert_is_iso8601_datetime_string(datetime) do
