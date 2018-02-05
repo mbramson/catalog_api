@@ -7,7 +7,8 @@ defmodule CatalogApi.CredentialsTest do
 
   describe "creds_for_request/1" do
     test "returns the proper credential tuple" do
-      assert {datetime, uuid, checksum} = Credentials.creds_for_request("view_item")
+      assert %{creds_datetime: datetime, creds_uuid: uuid, creds_checksum: checksum} =
+        Credentials.creds_for_request("view_item")
       assert is_iso8601_datetime_string(datetime)
       assert is_valid_uuid(uuid)
       assert is_valid_checksum(checksum)

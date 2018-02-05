@@ -12,12 +12,13 @@ defmodule CatalogApi.Credentials do
       iex> Credentials.creds_for_request("view_cart")
       {"2013-01-01T01:30:00Z", "b93cee9d-dd04-4154-9b5a-8768971e72b8", "VdMhe0wbSyIYeymMm2YvuCmK0vE="}
   """
-  @spec creds_for_request(String.t) :: {String.t, String.t, Strin.t}
+  @spec creds_for_request(String.t) ::
+    %{creds_datetime: String.t, creds_uuid: String.t, creds_checksum: String.t}
   def creds_for_request(method) when is_binary(method) do
-    creds_datetime = current_iso_8601_datetime()
-    creds_uuid     = generate_uuid()
-    creds_checksum = generate_checksum(method, creds_uuid, creds_datetime)
-    {creds_datetime, creds_uuid, creds_checksum}
+    datetime = current_iso_8601_datetime()
+    uuid     = generate_uuid()
+    checksum = generate_checksum(method, uuid, datetime)
+    %{creds_datetime: datetime, creds_uuid: uuid, creds_checksum: checksum}
   end
 
   def current_iso_8601_datetime do
