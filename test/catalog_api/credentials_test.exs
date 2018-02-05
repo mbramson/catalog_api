@@ -1,7 +1,6 @@
 defmodule CatalogApi.CredentialsTest do
   use ExUnit.Case
   use Quixir
-  doctest CatalogApi.Credentials, except: [creds_for_request: 1]
   alias CatalogApi.Credentials
   import CatalogApi.FormatHelper
 

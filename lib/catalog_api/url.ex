@@ -12,5 +12,4 @@ defmodule CatalogApi.Url do
     environment = Application.get_env(:catalog_api, :environment)
    "https://#{username}.#{environment}.catalogapi.com/v1/rest/"
   end
-
 end
