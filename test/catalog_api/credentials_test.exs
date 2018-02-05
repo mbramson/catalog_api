@@ -1,5 +1,6 @@
 defmodule CatalogApi.CredentialsTest do
   use ExUnit.Case
+  use Quixir
   doctest CatalogApi.Credentials
   alias CatalogApi.Credentials
 
@@ -51,6 +52,13 @@ defmodule CatalogApi.CredentialsTest do
       datetime = "2013-01-01T01:30:00Z"
 
       assert Credentials.generate_checksum(method_name, uuid, datetime) == "VdMhe0wbSyIYeymMm2YvuCmK0vE="
+    end
+
+    test "generates valid checksum for random input" do
+      ptest [method: string(), uuid: string(), datetime: string()] do
+        checksum = Credentials.generate_checksum(method, uuid, datetime)
+        assert_is_valid_checksum(checksum)
+      end
     end
   end
 end
