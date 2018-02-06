@@ -1,6 +1,6 @@
 defmodule CatalogApi.UrlTest do
   use ExUnit.Case
-  doctest CatalogApi.Url
+  doctest CatalogApi.Url, except: [url_for: 2], import: true
 
   alias CatalogApi.Url
   import CatalogApi.FormatHelper
