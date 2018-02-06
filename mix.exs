@@ -22,6 +22,7 @@ defmodule CatalogApi.Mixfile do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:httpoison, "~> 1.0"},
       { :quixir, "~> 0.9", only: :test },
       { :uuid, "~> 1.1" },
     ]
