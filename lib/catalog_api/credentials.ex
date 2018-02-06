@@ -72,6 +72,6 @@ defmodule CatalogApi.Credentials do
     key = Application.get_env(:catalog_api, :secret_key)
 
     :crypto.hmac(:sha, key, message)
-    |> Base.url_encode64
+    |> Base.encode64
   end
 end
