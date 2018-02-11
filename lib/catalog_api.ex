@@ -33,7 +33,11 @@ defmodule CatalogApi do
     #TODO validate each search parameter when used
 
     url = Url.url_for("search_catalog", params)
-    HTTPoison.get(url)
+    with {:ok, response} <- HTTPoison.get(url),
+         :ok <- validate_status(response),
+         {:ok, json} <- parse_json(response.body) do
+      {:ok, json}
+    end
   end
 
   def view_item(socket_id, catalog_item_id) do
@@ -192,6 +196,23 @@ defmodule CatalogApi do
     url = Url.url_for("order_list", params)
     HTTPoison.get(url)
   end
+
+  @spec validate_status(%{status_code: any()}) :: :ok | {:error, {:bad_status, any()}}
+  defp validate_status(response) do
+    case response.status_code do
+      200 -> :ok
+      status -> {:error, {:bad_status, status}}
+    end
+  end
+
+  defp parse_json(json) do
+    try do
+      {:ok, Poison.decode!(json)}
+    rescue
+      _ -> {:error, :response_json_parse_error}
+    end
+  end
+
 
   defp merge_required_filter_invalid(opts, required, valid_keys) do
     params = opts
