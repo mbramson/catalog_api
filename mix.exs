@@ -23,8 +23,9 @@ defmodule CatalogApi.Mixfile do
   defp deps do
     [
       {:httpoison, "~> 1.0"},
-      { :quixir, "~> 0.9", only: :test },
-      { :uuid, "~> 1.1" },
+      {:poison, "~> 3.1"},
+      {:quixir, "~> 0.9", only: :test },
+      {:uuid, "~> 1.1" },
     ]
   end
 

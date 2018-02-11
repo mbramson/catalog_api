@@ -3,6 +3,7 @@ defmodule CatalogApi do
   alias CatalogApi.Url
 
   # TODO add param validation
+  # TODO add response parsing
 
   def list_available_catalogs() do
     url = Url.url_for("list_available_catalogs")
