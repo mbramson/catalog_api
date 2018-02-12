@@ -35,10 +35,22 @@ defmodule CatalogApi do
     url = Url.url_for("search_catalog", params)
     with {:ok, response} <- HTTPoison.get(url),
          :ok <- validate_status(response),
-         {:ok, json} <- parse_json(response.body) do
-      {:ok, json}
+         {:ok, json} <- parse_json(response.body),
+         {:ok, items} <- extract_items_and_page_info(json) do
+      {:ok, items}
     end
   end
+
+  defp extract_items_and_page_info(%{"search_catalog_response" =>
+    %{"search_catalog_result" =>
+      %{"items" =>
+        %{"CatalogItem" => items},
+        "pager" => page_info}}}) do
+    items = Enum.map(items, fn item -> CatalogApi.Item.cast(item) end)
+    result = %{items: items, page_info: page_info}
+    {:ok, result}
+  end
+  defp extract_items(_), do: {:error, :unparseable_catalog_api_items}
 
   def view_item(socket_id, catalog_item_id) do
     params = %{socket_id: socket_id, catalog_item_id: catalog_item_id}

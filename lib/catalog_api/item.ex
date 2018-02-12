@@ -22,7 +22,7 @@ defmodule CatalogApi.Item do
             shipping_estimate: nil,
             tags: %{}
 
-  @valid_fields ~w(brad catalog_item_id catalog_price categories currency
+  @valid_fields ~w(brand catalog_item_id catalog_price categories currency
     has_options image_75 image_150 image_300 model name options original_points
     original_price points rank retail_price shipping_estimate tags)
 
