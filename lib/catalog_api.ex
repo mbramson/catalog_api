@@ -36,21 +36,26 @@ defmodule CatalogApi do
     with {:ok, response} <- HTTPoison.get(url),
          :ok <- validate_status(response),
          {:ok, json} <- parse_json(response.body),
-         {:ok, items} <- extract_items_and_page_info(json) do
-      {:ok, items}
+         {:ok, items} <- extract_items(json),
+         {:ok, page_info} <- extract_page_info(json) do
+      {:ok, %{items: items, page_info: page_info}}
     end
   end
 
-  defp extract_items_and_page_info(%{"search_catalog_response" =>
+  defp extract_items(%{"search_catalog_response" =>
     %{"search_catalog_result" =>
       %{"items" =>
-        %{"CatalogItem" => items},
-        "pager" => page_info}}}) do
-    items = Enum.map(items, fn item -> CatalogApi.Item.cast(item) end)
-    result = %{items: items, page_info: page_info}
-    {:ok, result}
+        %{"CatalogItem" => items}}}}) do
+    {:ok, Enum.map(items, fn item -> CatalogApi.Item.cast(item) end)}
   end
   defp extract_items(_), do: {:error, :unparseable_catalog_api_items}
+
+  defp extract_page_info(%{"search_catalog_response" =>
+    %{"search_catalog_result" =>
+      %{"pager" => page_info}}}) do
+    {:ok, page_info}
+  end
+  defp extract_page_info(_), do: {:error, :unparseable_catalog_api_page_info}
 
   def view_item(socket_id, catalog_item_id) do
     params = %{socket_id: socket_id, catalog_item_id: catalog_item_id}
