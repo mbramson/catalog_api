@@ -10,7 +10,7 @@ by adding `catalog_api` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:catalog_api, "~> 0.1.0"}
+    {:catalog_api, "~> 0.0.1"}
   ]
 end
 ```
