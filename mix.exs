@@ -7,8 +7,13 @@ defmodule CatalogApi.Mixfile do
       version: "0.0.1",
       elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env),
+      build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
-      deps: deps()
+      description: description(),
+      package: package(),
+      deps: deps(),
+      name: "CatalogApi",
+      source_url: "https://github.com/mbramson/catalog_api"
     ]
   end
 
@@ -33,4 +38,19 @@ defmodule CatalogApi.Mixfile do
   # Specifies which paths to compile per environment.
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_),     do: ["lib"]
+
+  defp description() do
+    """
+    CatalogApi is a client for the catalogapi.com API.
+    """
+  end
+
+  defp package() do
+    [
+      files: ["lib", "mix.exs", "README.md", "LICENSE.md"],
+      maintainers: ["Mathew Bramson"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/mbramson/catalog_api"}
+    ]
+  end
 end
