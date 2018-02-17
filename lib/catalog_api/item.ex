@@ -1,5 +1,6 @@
 defmodule CatalogApi.Item do
 
+  alias CatalogApi.Coercion
   alias CatalogApi.Item
 
   #TODO: Separate item struct for item in cart, as there are additional fields.
@@ -35,7 +36,7 @@ defmodule CatalogApi.Item do
   def cast(item_json) when is_map(item_json) do
     item_json
     |> filter_unknown_properties # To avoid dynamically creating atoms
-    |> coerce_integer_fields_to_boolean
+    |> Coercion.integer_fields_to_boolean(@boolean_fields)
     |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end)
     |> Enum.into(%{})
     |> to_struct
@@ -69,24 +70,4 @@ defmodule CatalogApi.Item do
   defp filter_unknown_properties(map) do
     Enum.filter(map, fn {k, _v} -> k in @valid_fields end)
   end
-
-  @spec coerce_integer_fields_to_boolean(map()) :: map()
-  defp coerce_integer_fields_to_boolean(map) do
-    Enum.map(map, fn {k, v} -> coerce_to_boolean_if_needed(k, v) end)
-  end
-
-  @spec coerce_to_boolean_if_needed(String.t, any()) :: {String.t, any()}
-  defp coerce_to_boolean_if_needed(key, value) do
-    cond do
-      key in @boolean_fields -> {key, coerce_integer_to_boolean(value)}
-      true -> {key, value}
-    end
-  end
-
-  @spec coerce_integer_to_boolean(any()) :: boolean() | {:error, :failed_boolean_coercion}
-  defp coerce_integer_to_boolean(0), do: false
-  defp coerce_integer_to_boolean(1), do: true
-  defp coerce_integer_to_boolean("0"), do: false
-  defp coerce_integer_to_boolean("1"), do: true
-  defp coerce_integer_to_boolean(_), do: {:error, :failed_boolean_coercion}
 end
