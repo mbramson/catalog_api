@@ -1,7 +1,8 @@
 defmodule CatalogApi do
 
-  alias CatalogApi.Url
+  alias CatalogApi.Coercion
   alias CatalogApi.Item
+  alias CatalogApi.Url
 
   # TODO add param validation
   # TODO add response parsing
@@ -141,8 +142,28 @@ defmodule CatalogApi do
   def cart_view(socket_id, external_user_id) do
     params = %{socket_id: socket_id, external_user_id: external_user_id}
     url = Url.url_for("cart_view", params)
-    HTTPoison.get(url)
+    with {:ok, response} <- HTTPoison.get(url),
+         :ok <- validate_status(response),
+         {:ok, json} <- parse_json(response.body),
+         {:ok, items} <- Item.extract_items_from_json(json),
+         {:ok, cart_status} <- extract_cart_status(json) do
+      # TODO: Also extract cart's address information and return it
+      {:ok, %{items: items, status: cart_status}}
+    end
   end
+
+  @spec extract_cart_status(map()) :: {:ok, map()} | {:error, :unparseable_response_cart_status}
+  defp extract_cart_status( %{"cart_view_response" => %{"cart_view_result" => params}}) do
+    boolean_fields = ~w(has_item_errors is_valid locked needs_address)
+
+    %{"error" => error, "has_item_errors" => has_item_errors, "is_valid" => is_valid,
+      "cart_version" => cart_version, "locked" => locked, "needs_address" => needs_address}
+      = params |> Coercion.integer_fields_to_boolean(boolean_fields, true)
+
+    {:ok, %{error: error, has_item_errors: has_item_errors, is_valid: is_valid,
+      cart_version: cart_version, locked: locked, needs_address: needs_address}}
+  end
+  defp extract_cart_status(_), do: {:error, :unparseable_response_cart_status}
 
   @doc """
   Validates the address and items in the cart. This is intended to be called
