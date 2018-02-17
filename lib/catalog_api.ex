@@ -81,14 +81,26 @@ defmodule CatalogApi do
     HTTPoison.get(url)
   end
 
-  def cart_add_item(socket_id, external_user_id, catalog_item_id, option_id, quantity) do
-    # TODO default to quantity of 1
-    # TODO add option_id to optional params
-    params = %{socket_id: socket_id,
-               external_user_id: external_user_id,
-               catalog_item_id: catalog_item_id,
-               option_id: option_id,
-               quantity: quantity}
+  @doc """
+  Adds the specified catalog item id to the user's shopping cart.
+
+  Optional parameters include:
+
+  - option_id (optional): The id of the option for the item that should be added to the
+    cart. If there are multiple options (such as color, size, etc.) for a given
+    item, this allows the correct option to be added. This parameter is optional.
+  - quantity (default: 1): The quantity of the given item to add to the cart.
+  """
+  def cart_add_item(socket_id, external_user_id, catalog_item_id, opts \\ []) do
+    defaults = [quantity: 1]
+    allowed = [:option_id, :quantity]
+    {:ok, optional_params} = filter_optional_params(defaults, opts, allowed)
+
+    required_params = %{socket_id: socket_id,
+                        external_user_id: external_user_id,
+                        catalog_item_id: catalog_item_id}
+    params = Map.merge(optional_params, required_params)
+
     url = Url.url_for("cart_add_item", params)
     HTTPoison.get(url)
   end
@@ -251,4 +263,17 @@ defmodule CatalogApi do
     |> Enum.filter(fn {k, _v} -> k in valid_keys end)
     |> Enum.into(%{})
   end
+
+  @spec filter_optional_params(Keyword.t, Keyword.t, list(atom())) ::
+    {:ok, %{optional(atom()) => any()}} | {:error, :invalid_argument}
+  defp filter_optional_params(defaults, opts, allowed)
+    when is_list(defaults) and is_list(opts) and is_list(allowed) do
+    filtered_params = defaults
+      |> Keyword.merge(opts)
+      |> Enum.filter(fn {k, _} -> k in allowed end)
+      |> Enum.into(%{})
+    {:ok, filtered_params}
+  end
+  defp filter_optional_params(_, _, _), do: {:error, :invalid_argument}
+
 end
