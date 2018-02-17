@@ -139,6 +139,30 @@ defmodule CatalogApi do
     HTTPoison.get(url)
   end
 
+  @doc """
+  Returns the contents of the specified user's shopping cart.
+
+  The return contains the list of items in the cart.
+
+  The return also returns a map under the :status key which contains some
+  information about the status of the cart. The keys contained in this map are
+  as follows:
+
+  - error: An error string describing the error. When there is no error, this
+    is "".
+  - has_item_errors: Boolean indicating whether the cart contains errors
+    specific to items.
+  - is_valid: Boolean indicating whether the cart is valid. If this is false,
+    than this cart cannot be used to place an order
+  - needs_address: Boolean indicating whether the cart is missing an address.
+  - locked: Boolean indicating whether the cart is locked or not. If the cart
+    is locked, an order can be placed with it, but it cannot be altered.
+  - cart_version: A String uuid indicating the current version of the cart.
+    This can be used to ensure that the cart which is being used to place an
+    order has not changed since the application's state has been updated.
+  """
+  @spec cart_view(integer(), integer()) ::
+    {:ok, %{items: list(Item.t), status: map()}} | {:error, atom()}
   def cart_view(socket_id, external_user_id) do
     params = %{socket_id: socket_id, external_user_id: external_user_id}
     url = Url.url_for("cart_view", params)

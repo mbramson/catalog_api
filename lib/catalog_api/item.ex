@@ -2,6 +2,8 @@ defmodule CatalogApi.Item do
 
   alias CatalogApi.Item
 
+  #TODO: Separate item struct for item in cart, as there are additional fields.
+
   defstruct brand: nil,
             catalog_item_id: nil,
             catalog_price: nil,
@@ -21,6 +23,8 @@ defmodule CatalogApi.Item do
             retail_price: nil,
             shipping_estimate: nil,
             tags: %{}
+
+  @type t :: %CatalogApi.Item{}
 
   @valid_fields ~w(brand catalog_item_id catalog_price categories currency
     has_options image_75 image_150 image_300 model name options original_points
