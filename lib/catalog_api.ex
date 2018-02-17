@@ -1,6 +1,7 @@
 defmodule CatalogApi do
 
   alias CatalogApi.Url
+  alias CatalogApi.Item
 
   # TODO add param validation
   # TODO add response parsing
@@ -36,19 +37,11 @@ defmodule CatalogApi do
     with {:ok, response} <- HTTPoison.get(url),
          :ok <- validate_status(response),
          {:ok, json} <- parse_json(response.body),
-         {:ok, items} <- extract_items(json),
+         {:ok, items} <- Item.extract_items_from_search_catalog(json),
          {:ok, page_info} <- extract_page_info(json) do
       {:ok, %{items: items, page_info: page_info}}
     end
   end
-
-  defp extract_items(%{"search_catalog_response" =>
-    %{"search_catalog_result" =>
-      %{"items" =>
-        %{"CatalogItem" => items}}}}) do
-    {:ok, Enum.map(items, fn item -> CatalogApi.Item.cast(item) end)}
-  end
-  defp extract_items(_), do: {:error, :unparseable_catalog_api_items}
 
   defp extract_page_info(%{"search_catalog_response" =>
     %{"search_catalog_result" =>
@@ -60,7 +53,12 @@ defmodule CatalogApi do
   def view_item(socket_id, catalog_item_id) do
     params = %{socket_id: socket_id, catalog_item_id: catalog_item_id}
     url = Url.url_for("view_item", params)
-    HTTPoison.get(url)
+    with {:ok, response} <- HTTPoison.get(url),
+         :ok <- validate_status(response),
+         {:ok, json} <- parse_json(response.body),
+         {:ok, item} <- Item.extract_item_from_view_item(json) do
+      {:ok, %{item: item}}
+    end
   end
 
   # TODO build address struct
