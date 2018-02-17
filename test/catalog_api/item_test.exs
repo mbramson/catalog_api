@@ -52,4 +52,26 @@ defmodule CatalogApi.ItemTest do
       refute Map.get(result, "bad_param")
     end
   end
+
+  describe "extract_item_from_json/1" do
+    test "extracts an item from the view_item response structure" do
+      json = %{"view_item_response" => %{"view_item_result" => %{"item" => @base_item_json}}}
+      assert {:ok, %Item{}} = Item.extract_items_from_json(json)
+    end
+
+    test "extracts items from the search_catalog response structure" do
+      items = [@base_item_json, @base_item_json]
+      json = %{"search_catalog_response" => %{"search_catalog_result" =>
+        %{"items" => %{"CatalogItem" => items}}}}
+      assert {:ok, [%Item{}, %Item{}]} = Item.extract_items_from_json(json)
+    end
+
+    test "returns an error tuple if structure is not parseable" do
+      error = {:error, :unparseable_catalog_api_items}
+      assert ^error = Item.extract_items_from_json(nil)
+      assert ^error = Item.extract_items_from_json(%{})
+      assert ^error = Item.extract_items_from_json([])
+    end
+
+  end
 end

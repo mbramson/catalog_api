@@ -50,7 +50,7 @@ defmodule CatalogApi.Item do
           %{"CatalogItem" => items}}}}) do
     {:ok, Enum.map(items, fn item -> cast(item) end)}
   end
-  def extract_item_from_json(_), do: {:error, :unparseable_catalog_api_items}
+  def extract_items_from_json(_), do: {:error, :unparseable_catalog_api_items}
 
   defp to_struct(map), do: struct(Item, map)
 
