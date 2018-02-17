@@ -37,7 +37,7 @@ defmodule CatalogApi do
     with {:ok, response} <- HTTPoison.get(url),
          :ok <- validate_status(response),
          {:ok, json} <- parse_json(response.body),
-         {:ok, items} <- Item.extract_items_from_search_catalog(json),
+         {:ok, items} <- Item.extract_items_from_json(json),
          {:ok, page_info} <- extract_page_info(json) do
       {:ok, %{items: items, page_info: page_info}}
     end
@@ -56,7 +56,7 @@ defmodule CatalogApi do
     with {:ok, response} <- HTTPoison.get(url),
          :ok <- validate_status(response),
          {:ok, json} <- parse_json(response.body),
-         {:ok, item} <- Item.extract_item_from_view_item(json) do
+         {:ok, item} <- Item.extract_items_from_json(json) do
       {:ok, %{item: item}}
     end
   end

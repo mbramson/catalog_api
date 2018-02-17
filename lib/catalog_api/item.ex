@@ -37,24 +37,20 @@ defmodule CatalogApi.Item do
     |> to_struct
   end
 
-  def extract_item_from_view_item(
+  def extract_items_from_json(
     %{"view_item_response" =>
       %{"view_item_result" =>
         %{"item" => item}}}) do
     {:ok, cast(item)}
   end
-  def extract_item_from_view_item(_), do: {:error, :unparseable_catalog_api_page_info}
-
-  def extract_items_from_search_catalog(
+  def extract_items_from_json(
     %{"search_catalog_response" =>
       %{"search_catalog_result" =>
         %{"items" =>
           %{"CatalogItem" => items}}}}) do
     {:ok, Enum.map(items, fn item -> cast(item) end)}
   end
-  def extract_items_from_search_catalog(_), do: {:error, :unparseable_catalog_api_items}
-
-
+  def extract_item_from_json(_), do: {:error, :unparseable_catalog_api_items}
 
   defp to_struct(map), do: struct(Item, map)
 
