@@ -30,6 +30,12 @@ defmodule CatalogApi.Address do
     end
   end
 
+  # TODO: Think about validation for state_province. Through poking the API,
+  # this can be anywhere between 1 and 50 alphanumeric characters despite the
+  # CatalogApi docstring saying that it must be 2 characters for US states. I
+  # guess outside of the US there is no such validation restriction? Maybe we
+  # can specially validate this field if the country is "US"
+
   def validate_field(:first_name, ""), do: [{:first_name, ["cannot be blank"]}]
   def validate_field(:first_name, first_name) when is_binary(first_name) do
     validate_field_length(:first_name, first_name, 40)
@@ -58,6 +64,11 @@ defmodule CatalogApi.Address do
     validate_field_length(:city, city, 40)
   end
   def validate_field(:city, _), do: [{:city, ["must be a string"]}]
+  def validate_field(:state_province, ""), do: [{:state_province, ["cannot be blank"]}]
+  def validate_field(:state_province, state_province) when is_binary(state_province) do
+    validate_field_length(:state_province, state_province, 50)
+  end
+  def validate_field(:state_province, _), do: [{:state_province, ["must be a string"]}]
   def validate_field(_field, _value), do: []
 
   defp validate_field_length(field, value, max_length) when is_binary(value) do

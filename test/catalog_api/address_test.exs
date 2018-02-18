@@ -155,5 +155,29 @@ defmodule CatalogApi.AddressTest do
       assert {:error, {:invalid_address, [{:city, [^error_message]}]}} =
         Address.validate(address)
     end
+
+    # state_province validation
+
+    test "returns an error tuple if state_province is blank" do
+      address = Map.put(@valid_address, :state_province, "")
+      error_message = "cannot be blank"
+      assert {:error, {:invalid_address, [{:state_province, [^error_message]}]}} =
+        Address.validate(address)
+    end
+
+    test "returns an error tuple if state_province is longer than 50 characters" do
+      state_province = "<  ten   ><  ten   ><  ten   ><  ten   ><  ten   >1"
+      address = Map.put(@valid_address, :state_province, state_province)
+      error_message = "cannot be longer than 50 characters"
+      assert {:error, {:invalid_address, [{:state_province, [^error_message]}]}} =
+        Address.validate(address)
+    end
+
+    test "returns an error tuple if state_province is not a string" do
+      address = Map.put(@valid_address, :state_province, 123)
+      error_message = "must be a string"
+      assert {:error, {:invalid_address, [{:state_province, [^error_message]}]}} =
+        Address.validate(address)
+    end
   end
 end
