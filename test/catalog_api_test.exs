@@ -27,7 +27,7 @@ defmodule CatalogApiTest do
       }
       with_mock HTTPoison, [get: fn(_url) -> {:ok, catalog_response} end] do
         response = CatalogApi.search_catalog(123)
-        assert {:ok, %{items: items, page_info: page_info}} = response
+        assert {:ok, %{items: items, page_info: _page_info}} = response
         Enum.map(items, &(assert %Item{} = &1))
       end
     end
