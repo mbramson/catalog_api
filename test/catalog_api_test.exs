@@ -4,6 +4,7 @@ defmodule CatalogApiTest do
 
   import Mock
 
+  alias CatalogApi.Fault
   alias CatalogApi.Item
 
   @response_headers [
@@ -42,7 +43,7 @@ defmodule CatalogApiTest do
       }
       with_mock HTTPoison, [get: fn(_url) -> {:ok, catalog_response} end] do
         response = CatalogApi.search_catalog(123)
-        assert {:error, {:bad_status, 400}} = response
+        assert {:error, {:catalog_api_fault, %Fault{}}} = response
       end
     end
   end

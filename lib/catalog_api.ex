@@ -1,6 +1,7 @@
 defmodule CatalogApi do
 
   alias CatalogApi.Coercion
+  alias CatalogApi.Error
   alias CatalogApi.Item
   alias CatalogApi.Url
 
@@ -36,7 +37,7 @@ defmodule CatalogApi do
 
     url = Url.url_for("search_catalog", params)
     with {:ok, response} <- HTTPoison.get(url),
-         :ok <- validate_status(response),
+         :ok <- Error.validate_response_status(response),
          {:ok, json} <- parse_json(response.body),
          {:ok, items} <- Item.extract_items_from_json(json),
          {:ok, page_info} <- extract_page_info(json) do
@@ -55,7 +56,7 @@ defmodule CatalogApi do
     params = %{socket_id: socket_id, catalog_item_id: catalog_item_id}
     url = Url.url_for("view_item", params)
     with {:ok, response} <- HTTPoison.get(url),
-         :ok <- validate_status(response),
+         :ok <- Error.validate_response_status(response),
          {:ok, json} <- parse_json(response.body),
          {:ok, item} <- Item.extract_items_from_json(json) do
       {:ok, %{item: item}}
@@ -104,7 +105,7 @@ defmodule CatalogApi do
 
     url = Url.url_for("cart_add_item", params)
     with {:ok, response} <- HTTPoison.get(url),
-         :ok <- validate_status(response),
+         :ok <- Error.validate_response_status(response),
          {:ok, json} <- parse_json(response.body),
          {:ok, description} <- extract_description(json) do
       {:ok, %{description: description}}
@@ -167,7 +168,7 @@ defmodule CatalogApi do
     params = %{socket_id: socket_id, external_user_id: external_user_id}
     url = Url.url_for("cart_view", params)
     with {:ok, response} <- HTTPoison.get(url),
-         :ok <- validate_status(response),
+         :ok <- Error.validate_response_status(response),
          {:ok, json} <- parse_json(response.body),
          {:ok, items} <- Item.extract_items_from_json(json),
          {:ok, cart_status} <- extract_cart_status(json) do
@@ -281,14 +282,6 @@ defmodule CatalogApi do
 
     url = Url.url_for("order_list", params)
     HTTPoison.get(url)
-  end
-
-  @spec validate_status(%{status_code: any()}) :: :ok | {:error, {:bad_status, any()}}
-  defp validate_status(response) do
-    case response.status_code do
-      200 -> :ok
-      status -> {:error, {:bad_status, status}}
-    end
   end
 
   defp parse_json(json) do
