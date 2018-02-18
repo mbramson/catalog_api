@@ -285,11 +285,7 @@ defmodule CatalogApi do
   end
 
   defp parse_json(json) do
-    try do
-      {:ok, Poison.decode!(json)}
-    rescue
-      _ -> {:error, :response_json_parse_error}
-    end
+    Poison.decode(json)
   end
 
 
