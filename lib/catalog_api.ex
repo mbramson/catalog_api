@@ -173,6 +173,7 @@ defmodule CatalogApi do
          {:ok, items} <- Item.extract_items_from_json(json),
          {:ok, cart_status} <- extract_cart_status(json) do
       # TODO: Also extract cart's address information and return it
+      # TODO: Ensure item is casted as a CartItem
       {:ok, %{items: items, status: cart_status}}
     end
   end

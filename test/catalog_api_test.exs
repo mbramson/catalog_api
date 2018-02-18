@@ -29,6 +29,7 @@ defmodule CatalogApiTest do
       with_mock HTTPoison, [get: fn(_url) -> {:ok, catalog_response} end] do
         response = CatalogApi.search_catalog(123)
         assert {:ok, %{items: items, page_info: _page_info}} = response
+
         Enum.map(items, &(assert %Item{} = &1))
       end
     end
@@ -145,5 +146,81 @@ defmodule CatalogApiTest do
         assert {:error, {:bad_status, 500}} = response
       end
     end
+  end
+
+  describe "cart_view/2" do
+    test "returns items in cart and the cart status for a successful response" do
+      body = "{\"cart_view_response\": {\"cart_view_result\": {\"phone_number\": \"\", \"city\": \"Cleveland\", \"first_name\": \"FirstName\", \"last_name\": \"LastName\", \"locked\": 0, \"address_2\": \"\", \"items\": {\"CartItem\": [{\"catalog_price\": \"192.21\", \"catalog_points\": 3845, \"name\": \"Keurig K15 Compact Coffee Maker\", \"currency\": \"USD\", \"quantity\": 4, \"catalog_item_id\": 4424207, \"image_uri\": \"https://dck0i7x64ch95.cloudfront.net/asset/b/c/e/bce0824dc47fa64656ca09e1baf556ac_75_.jpg\", \"points\": 3845, \"is_available\": 1, \"cart_price\": \"192.21\", \"error\": \"\", \"retail_price\": \"99.99\", \"shipping_estimate\": \"89.96\", \"is_valid\": 1}]}, \"error\": \"\", \"needs_address\": 0, \"is_valid\": 1, \"cart_version\": \"a6cc98d7-f8c1-4ac3-b81a-53eaab867381\", \"postal_code\": \"44444\", \"address_1\": \"123 Street Rd\", \"state_province\": \"OH\", \"address_3\": \"\", \"credentials\": {\"checksum\": \"bIXGn/l0rGkXH+6J66CkrjHC2M0=\", \"method\": \"cart_view\", \"uuid\": \"4ba524dd-c72d-48bb-bfe9-54a499cc4398\", \"datetime\": \"2018-02-18T20:28:55.816232+00:00\"}, \"country\": \"US\", \"email\": \"\", \"has_item_errors\": 0}}}"
+      catalog_response = %HTTPoison.Response{
+        body: body,
+        headers: @response_headers,
+        request_url: "",
+        status_code: 200
+      }
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, catalog_response} end] do
+        response = CatalogApi.cart_view(123, 1)
+        assert {:ok, %{items: items, status: status}} = response
+
+        Enum.map(items, &(assert %Item{} = &1))
+
+        assert status[:error] == ""
+        assert status[:has_item_errors] == false
+        assert status[:is_valid] == true
+        assert status[:locked] == false
+        assert status[:needs_address] == false
+        assert status[:cart_version] == "a6cc98d7-f8c1-4ac3-b81a-53eaab867381"
+      end
+    end
+
+    test "returns items in cart if successful response but no address info" do
+      body = "{\"cart_view_response\": {\"cart_view_result\": {\"locked\": 0, \"items\": {\"CartItem\": [{\"catalog_price\": \"28.97\", \"catalog_points\": 580, \"name\": \"4-Cup Classic Coffee Press\", \"currency\": \"USD\", \"quantity\": 1, \"catalog_item_id\": 4404890, \"image_uri\": \"https://dck0i7x64ch95.cloudfront.net/asset/1/d/4/1d49ef849ac7d399ccc5ebe0f24d3b7e_75_.jpg\", \"points\": 580, \"is_available\": 1, \"cart_price\":\"28.97\", \"error\": \"\", \"retail_price\": \"19.99\", \"shipping_estimate\": \"17.66\", \"is_valid\": 1}]}, \"cart_version\": \"7cb67931-f846-4d41-8bb2-9e544fbe7a76\", \"needs_address\": 1, \"is_valid\": 0, \"error\": \"The cart requires an address. \", \"credentials\": {\"checksum\": \"0Kly/RiY9XSCWvb2WPON+8PT3pc=\", \"method\": \"cart_view\", \"uuid\": \"f18c87c2-cf77-4fd6-b42f-1d323ddcb229\", \"datetime\": \"2018-02-18T20:39:44.126121+00:00\"}, \"has_item_errors\": 0}}}"
+      catalog_response = %HTTPoison.Response{
+        body: body,
+        headers: @response_headers,
+        request_url: "",
+        status_code: 200
+      }
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, catalog_response} end] do
+        response = CatalogApi.cart_view(123, 1)
+        assert {:ok, %{items: items, status: status}} = response
+
+        Enum.map(items, &(assert %Item{} = &1))
+
+        assert status[:error] == "The cart requires an address. "
+        assert status[:has_item_errors] == false
+        assert status[:is_valid] == false
+        assert status[:locked] == false
+        assert status[:needs_address] == true
+        assert status[:cart_version] == "7cb67931-f846-4d41-8bb2-9e544fbe7a76"
+      end
+    end
+
+    test "returns an error tuple with a fault struct when CatalogApi responds with a fault" do
+      body = "{\"Fault\": {\"faultcode\": \"Client.ArgumentError\", \"faultstring\": \"A valid socket_id is required.\", \"detail\": null}}"
+      catalog_response = %HTTPoison.Response{
+        body: body,
+        headers: @response_headers,
+        request_url: "",
+        status_code: 400
+      }
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, catalog_response} end] do
+        response = CatalogApi.cart_view(123, 1)
+        assert {:error, {:catalog_api_fault, %Fault{}}} = response
+      end
+    end
+
+    test "returns an error tuple when CatalogApi responds with an internal server error" do
+      catalog_response = %HTTPoison.Response{
+        body: "",
+        headers: @response_headers,
+        request_url: "",
+        status_code: 500
+      }
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, catalog_response} end] do
+        response = CatalogApi.cart_view(123, 1)
+        assert {:error, {:bad_status, 500}} = response
+      end
+    end
+
   end
 end
