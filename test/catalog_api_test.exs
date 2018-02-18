@@ -103,4 +103,47 @@ defmodule CatalogApiTest do
       end
     end
   end
+
+  describe "cart_add_item/4" do
+    test "returns a description if the response is successful" do
+      body = "{\"cart_add_item_response\": {\"cart_add_item_result\": {\"credentials\": {\"checksum\": \"0/7Bp8EXqVMN199cSIZFkb6fa04=\", \"method\": \"cart_add_item\", \"uuid\": \"0bc92613-110f-4b3b-af01-4aa9b7578ed8\", \"datetime\": \"2018-02-18T20:22:25.617678+00:00\"}, \"description\": \"Item quantity increased.\"}}}"
+      catalog_response = %HTTPoison.Response{
+        body: body,
+        headers: @response_headers,
+        request_url: "",
+        status_code: 200
+      }
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, catalog_response} end] do
+        response = CatalogApi.cart_add_item(123, 1, 456)
+        assert {:ok, %{description: "Item quantity increased."}} = response
+      end
+    end
+
+    test "returns an error tuple with a fault struct when CatalogApi responds with a fault" do
+      body = "{\"Fault\": {\"faultcode\": \"Client.ArgumentError\", \"faultstring\": \"A valid socket_id is required.\", \"detail\": null}}"
+      catalog_response = %HTTPoison.Response{
+        body: body,
+        headers: @response_headers,
+        request_url: "",
+        status_code: 400
+      }
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, catalog_response} end] do
+        response = CatalogApi.cart_add_item(123, 1, 456)
+        assert {:error, {:catalog_api_fault, %Fault{}}} = response
+      end
+    end
+
+    test "returns an error tuple when CatalogApi responds with an internal server error" do
+      catalog_response = %HTTPoison.Response{
+        body: "",
+        headers: @response_headers,
+        request_url: "",
+        status_code: 500
+      }
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, catalog_response} end] do
+        response = CatalogApi.cart_add_item(123, 1, 456)
+        assert {:error, {:bad_status, 500}} = response
+      end
+    end
+  end
 end
