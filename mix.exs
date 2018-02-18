@@ -29,6 +29,7 @@ defmodule CatalogApi.Mixfile do
     [
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
       {:httpoison, "~> 1.0"},
+      {:mock, "~> 0.3.0", only: :test},
       {:poison, "~> 3.1"},
       {:quixir, "~> 0.9", only: :test },
       {:uuid, "~> 1.1" },
