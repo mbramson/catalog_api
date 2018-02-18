@@ -227,10 +227,12 @@ defmodule CatalogApi do
   this request is successful. Returns an error if the order could not be
   placed.
 
-  If the cart_version argument is supplied, this method will only succeed if
-  the passed version matches the version of the current cart. This can be used
-  to ensure that the state of the users cart in your application has not become
-  stale before the order is placed.
+  There is one allowed optional parameter:
+
+  - cart_version: If this is supplied, this method will only succeed if the
+    passed version matches the version of the current cart. This can be used to
+    ensure that the state of the users cart in your application has not become
+    stale before the order is placed.
   """
   def cart_order_place(socket_id, external_user_id, opts \\ []) do
     allowed = [:cart_version]
