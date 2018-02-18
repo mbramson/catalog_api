@@ -221,6 +221,79 @@ defmodule CatalogApiTest do
         assert {:error, {:bad_status, 500}} = response
       end
     end
+  end
+
+  describe "cart_order_place/3" do
+    test "returns order information if order is successfully placed" do
+      body = "{\"cart_order_place_response\": {\"cart_order_place_result\": {\"credentials\": {\"checksum\": \"rgWGTavI1UmeSUczk1PkupRZTs8=\", \"method\": \"order_place\", \"uuid\": \"b015eb40-c880-4713-b771-4cd6481416f3\", \"datetime\": \"2018-02-18T20:52:31.406691+00:00\"}, \"order_number\": \"7151-11291-78980-0001\"}}}"
+      catalog_response = %HTTPoison.Response{
+        body: body,
+        headers: @response_headers,
+        request_url: "",
+        status_code: 200
+      }
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, catalog_response} end] do
+        response = CatalogApi.cart_order_place(1061, 1)
+        assert {:ok, _json} = response
+      end
+    end
+
+    test "returns an error tuple if the cart is not found" do
+      body = "{\"Fault\": {\"faultcode\": \"Client.APIError\", \"faultstring\": \"Cart not found.\", \"detail\":null}}"
+      catalog_response = %HTTPoison.Response{
+        body: body,
+        headers: @response_headers,
+        request_url: "",
+        status_code: 400
+      }
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, catalog_response} end] do
+        response = CatalogApi.cart_order_place(1061, 1)
+        assert {:error, :cart_not_found} = response
+      end
+    end
+
+    test "returns an error tuple if the cart has no shipping address" do
+      body = "{\"Fault\": {\"faultcode\": \"Client.APIError\", \"faultstring\": \"A shipping address must be added to the cart.\", \"detail\": null}}"
+      catalog_response = %HTTPoison.Response{
+        body: body,
+        headers: @response_headers,
+        request_url: "",
+        status_code: 400
+      }
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, catalog_response} end] do
+        response = CatalogApi.cart_order_place(1061, 1)
+        assert {:error, :no_shipping_address} = response
+      end
+
+    end
+
+    test "returns an error tuple with a fault struct when CatalogApi responds with a fault" do
+      body = "{\"Fault\": {\"faultcode\": \"Client.ArgumentError\", \"faultstring\": \"A valid socket_id is required.\", \"detail\": null}}"
+      catalog_response = %HTTPoison.Response{
+        body: body,
+        headers: @response_headers,
+        request_url: "",
+        status_code: 400
+      }
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, catalog_response} end] do
+        response = CatalogApi.cart_order_place(1061, 1)
+        assert {:error, {:catalog_api_fault, %Fault{}}} = response
+      end
+    end
+
+    test "returns an error tuple when CatalogApi responds with an internal server error" do
+      catalog_response = %HTTPoison.Response{
+        body: "",
+        headers: @response_headers,
+        request_url: "",
+        status_code: 500
+      }
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, catalog_response} end] do
+        response = CatalogApi.cart_order_place(1061, 1)
+        assert {:error, {:bad_status, 500}} = response
+      end
+    end
+
 
   end
 end

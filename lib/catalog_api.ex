@@ -2,6 +2,7 @@ defmodule CatalogApi do
 
   alias CatalogApi.Coercion
   alias CatalogApi.Error
+  alias CatalogApi.Fault
   alias CatalogApi.Item
   alias CatalogApi.Url
 
@@ -231,17 +232,27 @@ defmodule CatalogApi do
   to ensure that the state of the users cart in your application has not become
   stale before the order is placed.
   """
-  def cart_order_place(socket_id, external_user_id, cart_version \\ nil) do
-    cart_param = case cart_version do
-      nil          -> %{}
-      cart_version -> %{cart_version: cart_version}
-    end
+  def cart_order_place(socket_id, external_user_id, opts \\ []) do
+    allowed = [:cart_version]
+    {:ok, optional_params} = filter_optional_params([], opts, allowed)
 
-    params = cart_param
-      |> Map.merge(%{socket_id: socket_id, external_user_id: external_user_id})
+    required_params = %{socket_id: socket_id, external_user_id: external_user_id}
+    params = Map.merge(optional_params, required_params)
 
     url = Url.url_for("cart_order_place", params)
-    HTTPoison.get(url)
+    with {:ok, response} <- HTTPoison.get(url),
+         :ok <- Error.validate_response_status(response),
+         {:ok, json} <- parse_json(response.body) do
+      {:ok, json}
+    else
+      {:error, {:catalog_api_fault,
+        %Fault{faultstring: "Cart not found."}}} ->
+        {:error, :cart_not_found}
+      {:error, {:catalog_api_fault,
+        %Fault{faultstring: "A shipping address must be added to the cart."}}} ->
+        {:error, :no_shipping_address}
+      other -> other
+    end
   end
 
   def order_place() do
@@ -291,7 +302,7 @@ defmodule CatalogApi do
 
 
   defp merge_required_filter_invalid(opts, required, valid_keys) do
-    params = opts
+    opts
     |> Enum.into(%{})
     |> Map.merge(required)
     |> convert_keys_to_string
