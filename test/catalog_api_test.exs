@@ -33,7 +33,7 @@ defmodule CatalogApiTest do
       end
     end
 
-    test "returns an error tuple when CatalogApi responds with a fault" do
+    test "returns an error tuple with a fault struct when CatalogApi responds with a fault" do
       body = "{\"Fault\": {\"faultcode\": \"Client.ArgumentError\", \"faultstring\": \"A valid socket_id is required.\", \"detail\": null}}"
       catalog_response = %HTTPoison.Response{
         body: body,
@@ -44,6 +44,62 @@ defmodule CatalogApiTest do
       with_mock HTTPoison, [get: fn(_url) -> {:ok, catalog_response} end] do
         response = CatalogApi.search_catalog(123)
         assert {:error, {:catalog_api_fault, %Fault{}}} = response
+      end
+    end
+
+    test "returns an error tuple when CatalogApi responds with an internal server error" do
+      catalog_response = %HTTPoison.Response{
+        body: "",
+        headers: @response_headers,
+        request_url: "",
+        status_code: 500
+      }
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, catalog_response} end] do
+        response = CatalogApi.search_catalog(123)
+        assert {:error, {:bad_status, 500}} = response
+      end
+    end
+  end
+
+  describe "view_item/2" do
+    test "returns an Item struct for a successful response" do
+      body = "{\"view_item_response\": {\"view_item_result\": {\"item\": {\"original_price\": \"28.97\", \"catalog_price\": \"28.97\", \"image_300\": \"https://dck0i7x64ch95.cloudfront.net/asset/1/d/4/1d49ef849ac7d399ccc5ebe0f24d3b7e_300_.jpg\", \"description\": \"<ul><li>Makes rich elegant and satisfying coffee that is delicious every time</li><li>High-quality durable borosilicate glass</li><li>Stainless steel frame with chrome accents</li><li>Heat-resistant knob</li><li>Plunger that securely fits in the chrome lid</li><li>Hard plastic handle stays cool</li><li>Angled spout provides an even pour</li><li>4-Cup coffee capacity</li><li>Dishwashersafe</li><li><b>Includes:</b><ul><li>Filter spiral plate</li><li>Fine stainless steel mesh filter with cross plate</li><li>Easy to use plunger</li></uL>\", \"tags\": {\"string\": []}, \"brand\": \"Primula\", \"categories\": {\"integer\": [2848, 6, 189]}, \"rank\": 300, \"options\": {}, \"catalog_item_id\": 4404890, \"currency\": \"USD\", \"points\": 580, \"shipping_estimate\": \"17.66\", \"image_150\": \"https://dck0i7x64ch95.cloudfront.net/asset/1/d/4/1d49ef849ac7d399ccc5ebe0f24d3b7e_150_.jpg\", \"original_points\": 580, \"retail_price\": \"19.99\", \"has_options\": 0, \"model\": \"PCP-6404\", \"image_75\": \"https://dck0i7x64ch95.cloudfront.net/asset/1/d/4/1d49ef849ac7d399ccc5ebe0f24d3b7e_75_.jpg\", \"name\": \"4-Cup Classic Coffee Press\"}, \"credentials\": {\"checksum\": \"6ae/u+Fd+UGVAbkrsro8LfoVoNE=\", \"method\": \"view_item\", \"uuid\": \"f7ef214e-425e-4c26-9e89-f2f9724b513c\", \"datetime\": \"2018-02-18T20:16:46.098363+00:00\"}}}}"
+      catalog_response = %HTTPoison.Response{
+        body: body,
+        headers: @response_headers,
+        request_url: "",
+        status_code: 200
+      }
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, catalog_response} end] do
+        response = CatalogApi.view_item(123, 456)
+        assert {:ok, %{item: %Item{}}} = response
+      end
+    end
+
+    test "returns an error tuple with a fault struct when CatalogApi responds with a fault" do
+      body = "{\"Fault\": {\"faultcode\": \"Client.ArgumentError\", \"faultstring\": \"A valid socket_id is required.\", \"detail\": null}}"
+      catalog_response = %HTTPoison.Response{
+        body: body,
+        headers: @response_headers,
+        request_url: "",
+        status_code: 400
+      }
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, catalog_response} end] do
+        response = CatalogApi.view_item(123, 456)
+        assert {:error, {:catalog_api_fault, %Fault{}}} = response
+      end
+    end
+
+    test "returns an error tuple when CatalogApi responds with an internal server error" do
+      catalog_response = %HTTPoison.Response{
+        body: "",
+        headers: @response_headers,
+        request_url: "",
+        status_code: 500
+      }
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, catalog_response} end] do
+        response = CatalogApi.view_item(123, 456)
+        assert {:error, {:bad_status, 500}} = response
       end
     end
   end
