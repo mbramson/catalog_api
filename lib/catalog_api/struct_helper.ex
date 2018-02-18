@@ -16,16 +16,23 @@ defmodule CatalogApi.StructHelper do
     {:ok, list(String.t)}
     | {:error, {:struct_not_defined_for, atom()}}
   defp allowed_fields_as_strings(module) when is_atom(module) do
+    with {:ok, fields} <- allowed_fields(module) do
+      {:ok, Enum.map(fields, &(Atom.to_string(&1)))}
+    end
+  end
+
+  @spec allowed_fields(atom()) ::
+    {:ok, list(atom())}
+    | {:error, {:struct_not_defined_for, atom()}}
+  def allowed_fields(module) when is_atom(module) do
     try do
       fields = module
         |> struct
         |> Map.keys
         |> Enum.filter(&(&1 != :__struct__))
-        |> Enum.map(&(Atom.to_string(&1)))
       {:ok, fields}
     rescue
       UndefinedFunctionError -> {:error, {:struct_not_defined_for, module}}
     end
   end
-
 end
