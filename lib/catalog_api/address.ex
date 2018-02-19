@@ -1,4 +1,9 @@
 defmodule CatalogApi.Address do
+  @moduledoc """
+  Defines the CatalogApi.Address struct and functions which are responsible for
+  validation and interpretation of physical shipping addresses as they relate
+  to CatalogApi.
+  """
   alias CatalogApi.Address
   alias CatalogApi.Address.Email
   alias CatalogApi.Address.Iso3166
@@ -18,7 +23,42 @@ defmodule CatalogApi.Address do
 
   @type t :: %Address{}
 
-  @spec validate(t) :: :ok | {:error, any()}
+  @doc """
+  Validates an address struct to ensure that its values will not be rejected by
+  CatalogApi endpoints. This ensures that an error can be thrown before the
+  CatalogApi endpoint is actually hit.
+
+  If the Address struct is valid, :ok is returned.
+
+  If there are validation errors, than an error tuple is returned which
+  enumerates the field specific errors.
+
+  ## Examples
+
+      iex> address = %CatalogApi.Address{
+      ...>   first_name: "Jo",
+      ...>   last_name: "Bob",
+      ...>   address_1: "123 Street Road",
+      ...>   city: "Cleveland",
+      ...>   state_province: "OH",
+      ...>   postal_code: "44444",
+      ...>   country: "US"}
+      ...> CatalogApi.Address.validate(address)
+      :ok
+
+      iex> address = %CatalogApi.Address{
+      ...>   first_name: "Jo",
+      ...>   last_name: "Bob",
+      ...>   address_1: "123 Street Road",
+      ...>   city: "",
+      ...>   state_province: "OH",
+      ...>   postal_code: "44444",
+      ...>   country: "AJ"}
+      ...> CatalogApi.Address.validate(address)
+      {:error, {:invalid_address, [{:country, ["country code must be valid ISO 3166-1 alpha 2 country code"]}, {:city, ["cannot be blank"]}]}}
+
+  """
+  @spec validate(t) :: :ok | {:error, {:invalid_address, list()}}
   def validate(%Address{} = address) do
     {:ok, allowed_fields} = StructHelper.allowed_fields(Address)
     errors = allowed_fields
@@ -38,6 +78,11 @@ defmodule CatalogApi.Address do
   # guess outside of the US there is no such validation restriction? Maybe we
   # can specially validate this field if the country is "US"
 
+  @doc """
+  Validates a specific address field in the context of what is valid as input
+  to a CatalogApi address.
+  """
+  @spec validate_field(atom(), any()) :: list()
   def validate_field(:first_name, ""), do: [{:first_name, ["cannot be blank"]}]
   def validate_field(:first_name, first_name) when is_binary(first_name) do
     validate_field_length(:first_name, first_name, 40)
