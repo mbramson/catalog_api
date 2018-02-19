@@ -213,10 +213,9 @@ defmodule CatalogApi.AddressTest do
         Address.validate(address)
     end
 
-    test "returns an error tuple if country is longer than 2 characters" do
-      country = "123"
-      address = Map.put(@valid_address, :country, country)
-      error_message = "cannot be longer than 2 characters"
+    test "returns an error tuple if country is not an ISO-3166-1 Alpha 2 Country Code" do
+      address = Map.put(@valid_address, :country, "AP")
+      error_message = "country code must be valid ISO 3166-1 alpha 2 country code"
       assert {:error, {:invalid_address, [{:country, [^error_message]}]}} =
         Address.validate(address)
     end

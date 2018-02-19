@@ -1,5 +1,6 @@
 defmodule CatalogApi.Address do
   alias CatalogApi.Address
+  alias CatalogApi.Address.Iso3166
   alias CatalogApi.StructHelper
 
   defstruct first_name: "",
@@ -76,7 +77,10 @@ defmodule CatalogApi.Address do
   def validate_field(:postal_code, _), do: [{:postal_code, ["must be a string"]}]
   def validate_field(:country, ""), do: [{:country, ["cannot be blank"]}]
   def validate_field(:country, country) when is_binary(country) do
-    validate_field_length(:country, country, 2)
+    case Iso3166.validate(country) do
+      :ok -> []
+      :error -> [{:country, ["country code must be valid ISO 3166-1 alpha 2 country code"]}]
+    end
   end
   def validate_field(:country, _), do: [{:country, ["must be a string"]}]
   def validate_field(_field, _value), do: []
