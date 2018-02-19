@@ -1,5 +1,6 @@
 defmodule CatalogApi.Address do
   alias CatalogApi.Address
+  alias CatalogApi.Address.Email
   alias CatalogApi.Address.Iso3166
   alias CatalogApi.StructHelper
 
@@ -83,6 +84,15 @@ defmodule CatalogApi.Address do
     end
   end
   def validate_field(:country, _), do: [{:country, ["must be a string"]}]
+  def validate_field(:email, ""), do: []
+  def validate_field(:email, email) when is_binary(email) do
+    cond do
+      String.length(email) > 254 -> [{:email, ["cannot be longer than 254 characters"]}]
+      Email.valid?(email) -> []
+      true -> [{:email, ["must be a valid email"]}]
+    end
+  end
+  def validate_field(:email, _), do: [{:email, ["must be a string"]}]
   def validate_field(_field, _value), do: []
 
   defp validate_field_length(field, value, max_length) when is_binary(value) do

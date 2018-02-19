@@ -33,8 +33,6 @@ defmodule CatalogApi.Address.Iso3166 do
   def validate("BM"), do: :ok
   def validate("BN"), do: :ok
   def validate("BO"), do: :ok
-  def validate("BQ"), do: :ok
-  def validate("BQ"), do: :ok
   def validate("BR"), do: :ok
   def validate("BS"), do: :ok
   def validate("BT"), do: :ok
