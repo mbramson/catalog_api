@@ -256,5 +256,27 @@ defmodule CatalogApi.AddressTest do
       assert {:error, {:invalid_address, [{:email, [^error_message]}]}} =
         Address.validate(address)
     end
+
+    # phone_number validation
+
+    test "returns :ok if phone_number is blank" do
+      address = Map.put(@valid_address, :phone_number, "")
+      assert :ok = Address.validate(address)
+    end
+
+    test "returns an error tuple if phone_number is longer than 20 characters" do
+      phone_number = String.pad_trailing("", 21, "<  ten   >")
+      address = Map.put(@valid_address, :phone_number, phone_number)
+      error_message = "cannot be longer than 20 characters"
+      assert {:error, {:invalid_address, [{:phone_number, [^error_message]}]}} =
+        Address.validate(address)
+    end
+
+    test "returns an error tuple if phone_number is not a string" do
+      address = Map.put(@valid_address, :phone_number, 123)
+      error_message = "must be a string"
+      assert {:error, {:invalid_address, [{:phone_number, [^error_message]}]}} =
+        Address.validate(address)
+    end
   end
 end

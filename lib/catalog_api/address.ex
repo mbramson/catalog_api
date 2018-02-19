@@ -93,6 +93,11 @@ defmodule CatalogApi.Address do
     end
   end
   def validate_field(:email, _), do: [{:email, ["must be a string"]}]
+  def validate_field(:phone_number, ""), do: []
+  def validate_field(:phone_number, phone_number) when is_binary(phone_number) do
+    validate_field_length(:phone_number, phone_number, 20)
+  end
+  def validate_field(:phone_number, _), do: [{:phone_number, ["must be a string"]}]
   def validate_field(_field, _value), do: []
 
   defp validate_field_length(field, value, max_length) when is_binary(value) do
