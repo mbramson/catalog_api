@@ -74,6 +74,11 @@ defmodule CatalogApi.Address do
     validate_field_length(:postal_code, postal_code, 15)
   end
   def validate_field(:postal_code, _), do: [{:postal_code, ["must be a string"]}]
+  def validate_field(:country, ""), do: [{:country, ["cannot be blank"]}]
+  def validate_field(:country, country) when is_binary(country) do
+    validate_field_length(:country, country, 2)
+  end
+  def validate_field(:country, _), do: [{:country, ["must be a string"]}]
   def validate_field(_field, _value), do: []
 
   defp validate_field_length(field, value, max_length) when is_binary(value) do
