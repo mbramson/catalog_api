@@ -1,5 +1,6 @@
 defmodule CatalogApi do
 
+  alias CatalogApi.Address
   alias CatalogApi.Coercion
   alias CatalogApi.Error
   alias CatalogApi.Fault
@@ -64,13 +65,17 @@ defmodule CatalogApi do
     end
   end
 
-  # TODO build address struct
-  # TODO validate address params
+  # TODO make spec return type more specific
+  @spec cart_set_address(integer(), integer(), map()) ::
+    any()
+    | {:error, {:invalid_address, list()}}
   def cart_set_address(socket_id, external_user_id, address_params) do
-    params = address_params
-      |> Map.merge(%{socket_id: socket_id, external_user_id: external_user_id})
-    url = Url.url_for("cart_set_address", params)
-    HTTPoison.get(url)
+    with :ok <- Address.validate_params(address_params) do
+      params = address_params
+        |> Map.merge(%{socket_id: socket_id, external_user_id: external_user_id})
+      url = Url.url_for("cart_set_address", params)
+      HTTPoison.get(url)
+    end
   end
 
   def cart_set_item_quantity(socket_id, external_user_id, catalog_item_id, option_id, quantity) do
