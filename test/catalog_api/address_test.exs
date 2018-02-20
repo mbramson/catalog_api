@@ -11,6 +11,47 @@ defmodule CatalogApi.AddressTest do
                           postal_code: "44444",
                           country: "US"}
 
+  @valid_address_params %{"first_name" => "John",
+                          "last_name" => "Doe",
+                          "address_1" => "123 Street Rd",
+                          "city" => "Cleveland",
+                          "state_province" => "OH",
+                          "postal_code" => "44444",
+                          "country" => "US"}
+
+  @valid_address_atom_params %{first_name: "John",
+                               last_name: "Doe",
+                               address_1: "123 Street Rd",
+                               city: "Cleveland",
+                               state_province: "OH",
+                               postal_code: "44444",
+                               country: "US"}
+
+  describe "validate_params" do
+    test "returns :ok for valid address params" do
+      assert :ok = Address.validate_params(@valid_address_params)
+    end
+
+    test "returns :ok for valid address params when params have atom keys" do
+      assert :ok = Address.validate_params(@valid_address_atom_params)
+    end
+
+    test "returns :ok for valid address params when params have mixed keys" do
+      params = Map.put(@valid_address_params, :city, "Cleveland")
+        |> Map.delete("city")
+      assert :ok = Address.validate_params(params)
+    end
+
+    test "returns an error when given invalid address params" do
+      params = Map.put(@valid_address_params, "city", "")
+      assert {:error, {:invalid_address, _}} = Address.validate_params(params)
+    end
+
+    test "returns an error when given an empty map" do
+      assert {:error, {:invalid_address, _}} = Address.validate_params(%{})
+    end
+  end
+
   describe "validate/1" do
     test "returns :ok for a valid address" do
       assert :ok = Address.validate(@valid_address)

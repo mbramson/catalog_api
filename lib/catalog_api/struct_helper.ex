@@ -15,7 +15,7 @@ defmodule CatalogApi.StructHelper do
   @spec allowed_fields_as_strings(atom()) ::
     {:ok, list(String.t)}
     | {:error, {:struct_not_defined_for, atom()}}
-  defp allowed_fields_as_strings(module) when is_atom(module) do
+  def allowed_fields_as_strings(module) when is_atom(module) do
     with {:ok, fields} <- allowed_fields(module) do
       {:ok, Enum.map(fields, &(Atom.to_string(&1)))}
     end

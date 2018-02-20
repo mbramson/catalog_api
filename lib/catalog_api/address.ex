@@ -23,6 +23,40 @@ defmodule CatalogApi.Address do
 
   @type t :: %Address{}
 
+  @spec validate_params(map()) :: :ok | {:error, {:invalid_address, list()}}
+  def validate_params(params) when is_map(params) do
+    with {:ok, address_struct} <- convert_params_to_struct(params) do
+      validate(address_struct)
+    end
+  end
+
+  defp convert_params_to_struct(params) do
+    with {:ok, filtered_params} <- filter_disallowed_fields(params),
+         {:ok, atom_params} <- keys_to_atoms(filtered_params) do
+      to_struct(atom_params)
+    end
+  end
+
+  @spec keys_to_atoms(map()) :: %{optional(atom()) => any()}
+  defp keys_to_atoms(fields) do
+    {:ok, Enum.map(fields, fn {k, v} -> {ensure_atom(k), v} end)}
+  end
+
+  defp ensure_atom(value) when is_atom(value), do: value
+  defp ensure_atom(value) when is_binary(value), do: String.to_atom(value)
+
+  @spec filter_disallowed_fields(%{optional(String.t) => any()}) :: list({String.t, any()})
+  defp filter_disallowed_fields(fields) do
+    {:ok, allowed_fields_atoms} = StructHelper.allowed_fields(Address)
+    {:ok, allowed_fields_strings} = StructHelper.allowed_fields_as_strings(Address)
+    allowed_fields = allowed_fields_atoms ++ allowed_fields_strings
+    {:ok, Enum.filter(fields, fn {k, _} -> k in allowed_fields end)}
+  end
+
+  defp to_struct(map) do
+    {:ok, struct(Address, map)}
+  end
+
   @doc """
   Validates an address struct to ensure that its values will not be rejected by
   CatalogApi endpoints. This ensures that an error can be thrown before the
