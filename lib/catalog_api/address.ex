@@ -23,6 +23,43 @@ defmodule CatalogApi.Address do
 
   @type t :: %Address{}
 
+  @doc """
+  Validates a map with string or atom keys that is intended to represent a
+  CatalogApi address.
+
+  If the params are valid, :ok is returned.
+
+  If there are validation errors, than an error tuple is returned which
+  enumerates the field specific errors.
+
+  ## Example
+
+      iex> address = %{
+      ...>   first_name: "Jo",
+      ...>   last_name: "Bob",
+      ...>   address_1: "123 Street Road",
+      ...>   city: "Cleveland",
+      ...>   state_province: "OH",
+      ...>   postal_code: "44444",
+      ...>   country: "US"}
+      ...> CatalogApi.Address.validate_params(address)
+      :ok
+
+  This function also properly validates a map where the keys are strings.
+
+  ## Example
+
+      iex> address = %{
+      ...>   "first_name" => "Jo",
+      ...>   "last_name" => "Bob",
+      ...>   "address_1" => "123 Street Road",
+      ...>   "city" => "Cleveland",
+      ...>   "state_province" => "OH",
+      ...>   "postal_code" => "44444",
+      ...>   "country" => "US"}
+      ...> CatalogApi.Address.validate_params(address)
+      :ok
+  """
   @spec validate_params(map()) :: :ok | {:error, {:invalid_address, list()}}
   def validate_params(params) when is_map(params) do
     with {:ok, address_struct} <- convert_params_to_struct(params) do
