@@ -3,6 +3,23 @@ defmodule CatalogApi.Address do
   Defines the CatalogApi.Address struct and functions which are responsible for
   validation and interpretation of physical shipping addresses as they relate
   to CatalogApi.
+
+  To see the CatalogApi documentation for what is and isn't a valid Address see
+  http://username.catalogapi.com/docs/methods/cart_methods/#cart_set_address
+
+  An overview of the address fields is as follows:
+  - first_name (required): The first name of the person receiving shipment.
+  - last_name (required): The last name of the person receiving shipment.
+  - address_1 (required): The street address.
+  - address_2 (optional): The second line of the street address.
+  - address_3 (optional): The third line of the street address.
+  - city (required): The city.
+  - state_province (required): The state or province. If it is a US state, this should be
+    the 2 digit abbreviation. (Example: OH)
+  - postal_code (required) : The postal code. This should be a string.
+  - country (required): The ISO 3166-1 alpha-2 country code.
+  - email (optional): The email of the person receiving shipment.
+  - phone_number (optional): The phone number of the person receiving shipment.
   """
   alias CatalogApi.Address
   alias CatalogApi.Address.Email
@@ -32,6 +49,9 @@ defmodule CatalogApi.Address do
 
   If there are validation errors, than an error tuple is returned which
   enumerates the field specific errors.
+
+  To see the CatalogApi documentation for what is and isn't a valid Address see
+  http://username.catalogapi.com/docs/methods/cart_methods/#cart_set_address
 
   ## Example
 
@@ -105,6 +125,9 @@ defmodule CatalogApi.Address do
 
   If there are validation errors, than an error tuple is returned which
   enumerates the field specific errors.
+
+  To see the CatalogApi documentation for what is and isn't a valid Address see
+  http://username.catalogapi.com/docs/methods/cart_methods/#cart_set_address
 
   ## Examples
 
