@@ -21,12 +21,12 @@ end
 ```
 
 You will have to set a few values in the config.exs file of applications which consume this library.
-- secret_key: The secret key that was given to you by CatalogApi. This should
+- `secret_key`: The secret key that was given to you by CatalogApi. This should
   be available at http://<username>.catalogapi.com/stats/ where <username> is
   whatever username supplied by CatalogApi.
-- username: The username that was supplied to you by CatalogApi. This is the
+- `username`: The username that was supplied to you by CatalogApi. This is the
   username of your site itself, not your specific login credential.
-- environment: This can be "dev" or "prod", and corresponds to which endpoint
+- `environment`: This can be "dev" or "prod", and corresponds to which endpoint
   should be hit. See http://<username>.catalogapi.com/docs/environments/ for
   more documentation.
 

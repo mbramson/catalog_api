@@ -190,16 +190,16 @@ defmodule CatalogApi do
   information about the status of the cart. The keys contained in this map are
   as follows:
 
-  - error: An error string describing the error. When there is no error, this
+  - `error`: An error string describing the error. When there is no error, this
     is "".
-  - has_item_errors: Boolean indicating whether the cart contains errors
+  - `has_item_errors`: Boolean indicating whether the cart contains errors
     specific to items.
-  - is_valid: Boolean indicating whether the cart is valid. If this is false,
+  - `is_valid`: Boolean indicating whether the cart is valid. If this is false,
     than this cart cannot be used to place an order
-  - needs_address: Boolean indicating whether the cart is missing an address.
-  - locked: Boolean indicating whether the cart is locked or not. If the cart
+  - `needs_address`: Boolean indicating whether the cart is missing an address.
+  - `locked`: Boolean indicating whether the cart is locked or not. If the cart
     is locked, an order can be placed with it, but it cannot be altered.
-  - cart_version: A String uuid indicating the current version of the cart.
+  - `cart_version`: A String uuid indicating the current version of the cart.
     This can be used to ensure that the cart which is being used to place an
     order has not changed since the application's state has been updated.
   """
