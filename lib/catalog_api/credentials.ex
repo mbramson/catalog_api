@@ -5,9 +5,9 @@ defmodule CatalogApi.Credentials do
   endpoints.
 
   These pieces of data are:
-  - creds_datetime: The current ISO-8601 datetime.
-  - creds_uuid: A randomly generated UUID.
-  - creds_checksum: An HMAC-SHA1 generated hash of the supplied currently used
+  - `creds_datetime`: The current ISO-8601 datetime.
+  - `creds_uuid`: A randomly generated UUID.
+  - `creds_checksum`: An HMAC-SHA1 generated hash of the supplied currently used
     endpoint method, the creds_uuid, the creds_datetime, and the secret key
     from the application configuration's :secret_key key's value.
   """
@@ -17,7 +17,7 @@ defmodule CatalogApi.Credentials do
   provide credentials to make and authenticated request to CatalogApi.
 
   Note that the output for this function will depend on the secret key set in
-  the configuration for :catalog_api. The output will also depend on the
+  the configuration for `:catalog_api`. The output will also depend on the
   current time and the randomly generated uuid.
 
   ## Example
@@ -58,8 +58,8 @@ defmodule CatalogApi.Credentials do
 
   @doc """
   Produces an HMAC-SHA1 generated hash of the method name, a uuid, an ISO 8601
-  formatted datetime, and the :secret_key value from the application's
-  :catalog_api configuration.
+  formatted datetime, and the `:secret_key` value from the application's
+  `:catalog_api` configuration.
 
   ## Example
       iex> checksum = "b93cee9d-dd04-4154-9b5a-8768971e72b8"

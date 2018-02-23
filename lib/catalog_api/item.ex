@@ -1,4 +1,8 @@
 defmodule CatalogApi.Item do
+  @moduledoc """
+  Defines the CatalogApi.Item struct and functions which are responsible for
+  parsing items from CatalogApi responses.
+  """
 
   alias CatalogApi.Coercion
   alias CatalogApi.Item
