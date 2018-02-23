@@ -39,7 +39,7 @@ defmodule CatalogApi.Address do
     phone_number: ""
 
   @type t :: %Address{}
-  @type invalid_address_error :: {:error, {:invalid_address, list({atom(), list(String.t)})}}
+  @type invalid_address_error :: {:invalid_address, list({atom(), list(String.t)})}
 
   @doc """
   Validates a map with string or atom keys that is intended to represent a
@@ -81,7 +81,9 @@ defmodule CatalogApi.Address do
       ...> CatalogApi.Address.validate_params(address)
       :ok
   """
-  @spec validate_params(t | map()) :: :ok | invalid_address_error
+  @spec validate_params(t | map()) ::
+    :ok
+    | {:error, invalid_address_error}
   def validate_params(%Address{} = address), do: validate(address)
   def validate_params(params) when is_map(params) do
     with {:ok, address_struct} <- convert_params_to_struct(params) do
@@ -154,7 +156,9 @@ defmodule CatalogApi.Address do
       {:error, {:invalid_address, [{:country, ["country code must be valid ISO 3166-1 alpha 2 country code"]}, {:city, ["cannot be blank"]}]}}
 
   """
-  @spec validate(t) :: :ok | {:error, {:invalid_address, list()}}
+  @spec validate(t) ::
+    :ok |
+    {:error, invalid_address_error}
   def validate(%Address{} = address) do
     {:ok, allowed_fields} = StructHelper.allowed_fields(Address)
     errors = allowed_fields

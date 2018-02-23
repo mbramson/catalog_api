@@ -82,7 +82,7 @@ defmodule CatalogApi do
   """
   @spec cart_set_address(integer(), integer(), map()) ::
     {:ok, %{description: String.t}}
-    | Address.invalid_address_error
+    | {:error, Address.invalid_address_error}
     | {:error, {:bad_status, integer()}}
     | {:error, {:catalog_api_fault, Error.extracted_fault}}
     | {:error, Poison.ParseError.t}
