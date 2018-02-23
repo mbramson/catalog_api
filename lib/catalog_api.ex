@@ -1,4 +1,7 @@
 defmodule CatalogApi do
+  @moduledoc """
+  Contains top-level API functions for making requests to CatalogAPI.
+  """
 
   alias CatalogApi.Address
   alias CatalogApi.Coercion
@@ -73,11 +76,11 @@ defmodule CatalogApi do
   The list of available address parameters can be found in the module
   documentation for CatalogApi.Address.
 
-  You can use a %CatalogApi.Address{} struct for the address parameters
+  You can use a `%CatalogApi.Address{}` struct for the address parameters
   argument.
 
   If the address parameters are not valid as per
-  CatalogApi.Address.validate_params/1, then this function will return an error
+  `CatalogApi.Address.validate_params/1`, then this function will return an error
   tuple without making a call to the CatalogApi endpoint.
   """
   @spec cart_set_address(integer(), integer(), map()) ::

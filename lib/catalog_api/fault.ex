@@ -9,14 +9,23 @@ defmodule CatalogApi.Fault do
 
   defstruct detail: "", faultcode: "", faultstring: ""
 
-  @type t :: %Fault{}
+  @type t :: %Fault{
+    detail: String.t,
+    faultcode: String.t,
+    faultstring: String.t}
 
+  @doc """
+  Extracts a `%Fault{}` struct from previously parsed json of the entire fault response.
+  """
   @spec extract_fault_from_json(any()) ::
     {:ok, t}
     | {:error, :unparseable_catalog_api_fault}
   def extract_fault_from_json(%{"Fault" => fault_json}), do: {:ok, cast(fault_json)}
   def extract_fault_from_json(_), do: {:error, :unparseable_catalog_api_fault}
 
+  @doc """
+  Safely casts some extracted json of the fault itself to a `%Fault{}` struct.
+  """
   @spec cast(map()) :: t
   def cast(fault_json) do
     fault_json
