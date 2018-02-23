@@ -22,6 +22,7 @@ defmodule CatalogApi.Address do
     phone_number: ""
 
   @type t :: %Address{}
+  @type invalid_address_error :: {:error, {:invalid_address, list({atom(), list(String.t)})}}
 
   @doc """
   Validates a map with string or atom keys that is intended to represent a
@@ -60,7 +61,7 @@ defmodule CatalogApi.Address do
       ...> CatalogApi.Address.validate_params(address)
       :ok
   """
-  @spec validate_params(map()) :: :ok | {:error, {:invalid_address, list()}}
+  @spec validate_params(map()) :: :ok | invalid_address_error
   def validate_params(params) when is_map(params) do
     with {:ok, address_struct} <- convert_params_to_struct(params) do
       validate(address_struct)

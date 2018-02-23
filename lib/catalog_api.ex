@@ -65,10 +65,13 @@ defmodule CatalogApi do
     end
   end
 
-  # TODO make spec return type more specific
   @spec cart_set_address(integer(), integer(), map()) ::
-    any()
-    | {:error, {:invalid_address, list()}}
+    {:ok, %{description: String.t}}
+    | Address.invalid_address_error
+    | {:error, {:bad_status, integer()}}
+    | {:error, {:catalog_api_fault, Error.extracted_fault}}
+    | {:error, Poison.ParseError.t}
+    | {:error, :unparseable_response_description}
   def cart_set_address(socket_id, external_user_id, address_params) do
     with :ok <- Address.validate_params(address_params) do
       params = address_params
@@ -124,7 +127,9 @@ defmodule CatalogApi do
     end
   end
 
-  @spec extract_description(map()) :: {:ok, any()} | {:error, :unparseable_response_description}
+  @spec extract_description(map()) ::
+    {:ok, any()}
+    | {:error, :unparseable_response_description}
   defp extract_description(
     %{"cart_add_item_response" =>
       %{"cart_add_item_result" =>

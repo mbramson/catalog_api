@@ -11,6 +11,9 @@ defmodule CatalogApi.Fault do
 
   @type t :: %Fault{}
 
+  @spec extract_fault_from_json(any()) ::
+    {:ok, t}
+    | {:error, :unparseable_catalog_api_fault}
   def extract_fault_from_json(%{"Fault" => fault_json}), do: {:ok, cast(fault_json)}
   def extract_fault_from_json(_), do: {:error, :unparseable_catalog_api_fault}
 
