@@ -61,7 +61,8 @@ defmodule CatalogApi.Address do
       ...> CatalogApi.Address.validate_params(address)
       :ok
   """
-  @spec validate_params(map()) :: :ok | invalid_address_error
+  @spec validate_params(t | map()) :: :ok | invalid_address_error
+  def validate_params(%Address{} = address), do: validate(address)
   def validate_params(params) when is_map(params) do
     with {:ok, address_struct} <- convert_params_to_struct(params) do
       validate(address_struct)

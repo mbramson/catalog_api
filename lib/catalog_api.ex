@@ -65,6 +65,21 @@ defmodule CatalogApi do
     end
   end
 
+  @doc """
+  Sets the shipping address for the given user's cart.
+
+  Requires a socket_id, an external_user_id, and a map of address parameters.
+
+  The list of available address parameters can be found in the module
+  documentation for CatalogApi.Address.
+
+  You can use a %CatalogApi.Address{} struct for the address parameters
+  argument.
+
+  If the address parameters are not valid as per
+  CatalogApi.Address.validate_params/1, then this function will return an error
+  tuple without making a call to the CatalogApi endpoint.
+  """
   @spec cart_set_address(integer(), integer(), map()) ::
     {:ok, %{description: String.t}}
     | Address.invalid_address_error
