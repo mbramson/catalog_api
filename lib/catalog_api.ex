@@ -74,7 +74,13 @@ defmodule CatalogApi do
       params = address_params
         |> Map.merge(%{socket_id: socket_id, external_user_id: external_user_id})
       url = Url.url_for("cart_set_address", params)
-      HTTPoison.get(url)
+
+      with {:ok, response} <- HTTPoison.get(url),
+           :ok <- Error.validate_response_status(response),
+           {:ok, json} <- parse_json(response.body),
+           {:ok, description} <- extract_description(json) do
+        {:ok, %{description: description}}
+      end
     end
   end
 
@@ -122,6 +128,12 @@ defmodule CatalogApi do
   defp extract_description(
     %{"cart_add_item_response" =>
       %{"cart_add_item_result" =>
+        %{"description" => description}}}) do
+    {:ok, description}
+  end
+  defp extract_description(
+    %{"cart_set_address_response" =>
+      %{"cart_set_address_result" =>
         %{"description" => description}}}) do
     {:ok, description}
   end

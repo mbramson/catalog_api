@@ -17,6 +17,14 @@ defmodule CatalogApiTest do
     {"Connection", "keep-alive"}
   ]
 
+  @valid_address %{first_name: "john",
+                   last_name: "doe",
+                   address_1: "1 Street rd",
+                   city: "Cleveland",
+                   state_province: "OH",
+                   postal_code: "44444",
+                   country: "US"}
+
   describe "search_catalog/2" do
     test "returns a list of items and page info upon success" do
       body = "{\"search_catalog_response\": {\"search_catalog_result\": {\"items\": {\"CatalogItem\": [{\"original_price\": \"11.42\", \"catalog_price\": \"11.42\", \"image_300\": \"https://dck0i7x64ch95.cloudfront.net/asset/b/3/e/b3ead5dc9d8e3b4e39ff4a27e3a183ac_300_.jpg\", \"name\": \"Brown Bear, Brown Bear, What Do You See?: 50th Anniversary Edition\", \"tags\": {\"string\": []}, \"brand\": \"Henry Holt & Company\", \"categories\": {\"integer\": [156, 179]}, \"rank\": 300, \"options\": {}, \"catalog_item_id\": 1168951, \"currency\": \"USD\", \"points\": 229, \"shipping_estimate\": \"4.00\", \"image_150\": \"https://dck0i7x64ch95.cloudfront.net/asset/b/3/e/b3ead5dc9d8e3b4e39ff4a27e3a183ac_150_.jpg\", \"original_points\": 229, \"retail_price\": \"7.95\", \"has_options\": 0, \"model\": \"9780805047905\", \"image_75\": \"https://dck0i7x64ch95.cloudfront.net/asset/b/3/e/b3ead5dc9d8e3b4e39ff4a27e3a183ac_75_.jpg\"}]}, \"pager\": {\"has_next\": 0, \"sort\": \"score desc\", \"page\": 1, \"first_page\": 1, \"last_page\": 1, \"has_previous\": 0, \"per_page\": 10, \"pages\": {\"integer\": [1]}, \"result_count\": 1}, \"credentials\": {\"checksum\": \"Cyawkogo/jPEmTZMD89TqQCUmkc=\", \"method\": \"search_catalog\", \"uuid\": \"5b58c232-5d2b-4bad-be28-1aeed14c6c88\", \"datetime\": \"2018-02-17T23:55:08.262679+00:00\"}}}}"
@@ -100,6 +108,58 @@ defmodule CatalogApiTest do
       }
       with_mock HTTPoison, [get: fn(_url) -> {:ok, catalog_response} end] do
         response = CatalogApi.view_item(123, 456)
+        assert {:error, {:bad_status, 500}} = response
+      end
+    end
+  end
+
+  describe "cart_set_address/3" do
+    test "returns a description if the response is successful" do
+      body = "{\"cart_set_address_response\": {\"cart_set_address_result\": {\"credentials\": {\"checksum\": \"GgSbBf1eHGqK7G3O3Db8rAIbwYI=\", \"method\": \"cart_set_address\", \"uuid\": \"77643000-adb8-444b-8775-41459e28bbaa\", \"datetime\": \"2018-02-23T02:49:07.821677+00:00\"}, \"description\": \"Address Updated\"}}}"
+      catalog_response = %HTTPoison.Response{
+        body: body,
+        headers: @response_headers,
+        request_url: "",
+        status_code: 200
+      }
+
+      address = %{first_name: "john",
+                  last_name: "doe",
+                  address_1: "1 Street rd",
+                  city: "Cleveland",
+                  state_province: "OH",
+                  postal_code: "44444",
+                  country: "US"}
+
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, catalog_response} end] do
+        response = CatalogApi.cart_set_address(123, 1, @valid_address)
+        assert {:ok, %{description: "Address Updated"}} = response
+      end
+    end
+
+    test "returns an error tuple with a fault struct when CatalogApi responds with a fault" do
+      body = "{\"Fault\": {\"faultcode\": \"Client.ArgumentError\", \"faultstring\": \"A valid socket_id is required.\", \"detail\": null}}"
+      catalog_response = %HTTPoison.Response{
+        body: body,
+        headers: @response_headers,
+        request_url: "",
+        status_code: 400
+      }
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, catalog_response} end] do
+        response = CatalogApi.cart_set_address(123, 1, @valid_address)
+        assert {:error, {:catalog_api_fault, %Fault{}}} = response
+      end
+    end
+
+    test "returns an error tuple when CatalogApi responds with an internal server error" do
+      catalog_response = %HTTPoison.Response{
+        body: "",
+        headers: @response_headers,
+        request_url: "",
+        status_code: 500
+      }
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, catalog_response} end] do
+        response = CatalogApi.cart_set_address(123, 1, @valid_address)
         assert {:error, {:bad_status, 500}} = response
       end
     end
