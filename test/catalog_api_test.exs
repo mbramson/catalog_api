@@ -117,6 +117,14 @@ defmodule CatalogApiTest do
       end
     end
 
+    test "returns invalid address error tuple if address is not valid" do
+      invalid_address = Map.put(@valid_address, :first_name, "")
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, @internal_error_response} end] do
+        response = CatalogApi.cart_set_address(123, 1, invalid_address)
+        assert {:error, {:invalid_address, [{:first_name, ["cannot be blank"]}]}} = response
+      end
+    end
+
     test "returns an error tuple with a fault struct when CatalogApi responds with a fault" do
       with_mock HTTPoison, [get: fn(_url) -> {:ok, @fault_response} end] do
         response = CatalogApi.cart_set_address(123, 1, @valid_address)
