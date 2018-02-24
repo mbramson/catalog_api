@@ -32,7 +32,7 @@ defmodule CatalogApiTest do
 
   describe "search_catalog/2" do
     test "returns a list of items and page info upon success" do
-      with_mock HTTPoison, [get: fn(_url) -> {:ok, Fixture.search_catalog_success(true)} end] do
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, Fixture.search_catalog_success()} end] do
         response = CatalogApi.search_catalog(123)
         assert {:ok, %{items: items, page_info: _page_info}} = response
         Enum.map(items, &(assert %Item{} = &1))
@@ -56,7 +56,7 @@ defmodule CatalogApiTest do
 
   describe "view_item/2" do
     test "returns an Item struct for a successful response" do
-      with_mock HTTPoison, [get: fn(_url) -> {:ok, Fixture.view_item_success(true)} end] do
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, Fixture.view_item_success()} end] do
         response = CatalogApi.view_item(123, 456)
         assert {:ok, %{item: %Item{}}} = response
       end
@@ -79,7 +79,7 @@ defmodule CatalogApiTest do
 
   describe "cart_set_address/3" do
     test "returns a description if the response is successful" do
-      with_mock HTTPoison, [get: fn(_url) -> {:ok, Fixture.cart_set_address_success(true)} end] do
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, Fixture.cart_set_address_success()} end] do
         response = CatalogApi.cart_set_address(123, 1, @valid_address)
         assert {:ok, %{description: "Address Updated"}} = response
       end
@@ -110,7 +110,7 @@ defmodule CatalogApiTest do
 
   describe "cart_add_item/4" do
     test "returns a description if the response is successful" do
-      with_mock HTTPoison, [get: fn(_url) -> {:ok, Fixture.cart_add_item_success(true)} end] do
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, Fixture.cart_add_item_success()} end] do
         response = CatalogApi.cart_add_item(123, 1, 456)
         assert {:ok, %{description: "Item quantity increased."}} = response
       end
@@ -133,7 +133,7 @@ defmodule CatalogApiTest do
 
   describe "cart_view/2" do
     test "returns items in cart and the cart status for a successful response" do
-      with_mock HTTPoison, [get: fn(_url) -> {:ok, Fixture.cart_view_success(true)} end] do
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, Fixture.cart_view_success()} end] do
         response = CatalogApi.cart_view(123, 1)
         assert {:ok, %{items: items, status: status}} = response
 
@@ -149,7 +149,7 @@ defmodule CatalogApiTest do
     end
 
     test "returns items in cart if successful response but no address info" do
-      with_mock HTTPoison, [get: fn(_url) -> {:ok, Fixture.cart_view_no_address_success(true)} end] do
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, Fixture.cart_view_no_address_success()} end] do
         response = CatalogApi.cart_view(123, 1)
         assert {:ok, %{items: items, status: status}} = response
 
@@ -181,7 +181,7 @@ defmodule CatalogApiTest do
 
   describe "cart_order_place/3" do
     test "returns order information if order is successfully placed" do
-      with_mock HTTPoison, [get: fn(_url) -> {:ok, Fixture.cart_order_place_success(true)} end] do
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, Fixture.cart_order_place_success()} end] do
         response = CatalogApi.cart_order_place(1061, 1)
         assert {:ok, _json} = response
       end
