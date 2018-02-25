@@ -57,12 +57,22 @@ defmodule CatalogApi do
   end
   defp extract_page_info(_), do: {:error, :unparseable_catalog_api_page_info}
 
+  @doc """
+  Retrieves information about a specific item.
+
+  Requires a socket_id and an item_id.
+
+  Returns a `%CatalogApi.Item{}` struct upon a successful request.
+
+  If the item does not exist, this returns an error tuple of the format
+  `{:error, :item_not_found}`
+  """
   @spec view_item(integer(), integer() | String.t) ::
     {:ok, %{item: Item.t()}}
     | {:error, {:bad_status, integer()}}
     | {:error, {:catalog_api_fault, Error.extracted_fault}}
     | {:error, Poison.ParseError.t}
-    | {:error, {:not_found, String.t}}
+    | {:error, :item_not_found}
   def view_item(socket_id, catalog_item_id) do
     params = %{socket_id: socket_id, catalog_item_id: catalog_item_id}
     url = Url.url_for("view_item", params)
