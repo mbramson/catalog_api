@@ -33,6 +33,46 @@ defmodule CatalogApi do
   @valid_search_catalog_keys ~w(socket_id name search category_id min_points
     max_points min_price max_price max_rank tag page per_page sort
     catalog_item_ids)
+
+  @doc """
+  Searches for CatalogApi items which meet the specified criteria.
+
+  Requires a socket_id and a list of criteria that returned items must match.
+  All search parameters are optional.
+
+  Allowed search parameters:
+  - `name`: The name of the item.
+  - `search`: Matches the name, description or model of items.
+  - `category_id`: Matches only items within this category_id. (This includes
+    any child categories of the category_id.) The category_id comes from the
+    catalog_breakdown method.
+  - `min_points`: Matches only items that cost a greater or equal number of points.
+  - `max_points`: Matches only items that cost a lesser or equal number of points.
+  - `min_price`: Matches only items that cost a great or equal amount.
+  - `max_price`: Matches only items that cost a lesser or equal amount.
+  - `max_rank`: Matches only items with a rank lesser than or equal to the
+    specified value. The rank of an item indicates its popularity between 1 and
+    1000. A smaller value indicates a more popular item.
+  - `tag`: Matches items with custom tags.
+  - `page`: The page to retrieve.
+  - `per_page`: The quantity of items to retrieve per page. Must be between 1
+    and 50. The default is 10 if this parameter is not specified
+  - `sort`: The method to use to sort the results. Allowed values are:
+    - `"points desc"` - Will return items worth the most points first.
+    - `"points asc"` - Will return items worth the least points first.
+    - `"rank asc"`: Will return items with the most popular ones first.
+    - `"score desc"` (default): Will return items with the the most relevant
+      ones first.  Sorting by score only makes sense when you are searching with
+      the "name" or "search" arguments.
+    - `"random asc"`: Will return the items in random order.
+  - `catalog_item_ids`: Accepts an array of items. Matches only items that ar
+    in the given list
+  """
+  @spec search_catalog(integer(), map()) ::
+    {:ok, %{items: Item.t, page_info: map()}}
+    | {:error, {:bad_status, integer()}}
+    | {:error, {:catalog_api_fault, Error.extracted_fault}}
+    | {:error, Poison.ParseError.t}
   def search_catalog(socket_id, opts \\ %{}) do
     required_params = %{socket_id: socket_id}
     params = merge_required_filter_invalid(opts, required_params,
@@ -58,7 +98,7 @@ defmodule CatalogApi do
   defp extract_page_info(_), do: {:error, :unparseable_catalog_api_page_info}
 
   @doc """
-  Retrieves information about a specific item.
+  Retrieves information about a specific CatalogApi item.
 
   Requires a socket_id and an item_id.
 
