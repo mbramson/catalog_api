@@ -1,6 +1,6 @@
 # CatalogApi
 
-![Travis CI](https://travis-ci.org/mbramson/catalog_api.svg?branch=master)
+[![Travis CI](https://travis-ci.org/mbramson/catalog_api.svg?branch=master)](https://travis-ci.org/mbramson/catalog_api)
 
 CatalogApi is a library that can be used to make interacting with the
 catalogapi.com API more straightforward in elixir.
