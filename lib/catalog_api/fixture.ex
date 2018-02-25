@@ -75,6 +75,23 @@ defmodule CatalogApi.Fixture do
     end
   end
 
+  @no_item_fault_json "{\"Fault\": {\"faultcode\": \"Client.APIError\", \"faultstring\": \"Invalid catalog_item_id: 123123\",\"detail\": null}}"
+
+  @doc """
+  Returns a `%HTTPPoison.Response{}` struct with a 400 status code and a body
+  which contains a response to the view_item method indicating that the
+  requested item did not exit
+
+  Returns only the body text if passed an argument of false to `as_response`.
+  """
+  @spec no_item_fault(boolean()) :: String.t | Response.t
+  def no_item_fault(as_response \\ true) do
+    case as_response do
+      true -> @no_item_fault_json |> as_response(400)
+      false -> @no_item_fault_json
+    end
+  end
+
   @cart_set_address_success_json "{\"cart_set_address_response\": {\"cart_set_address_result\": {\"credentials\": {\"checksum\": \"GgSbBf1eHGqK7G3O3Db8rAIbwYI=\", \"method\": \"cart_set_address\", \"uuid\": \"77643000-adb8-444b-8775-41459e28bbaa\", \"datetime\": \"2018-02-23T02:49:07.821677+00:00\"}, \"description\": \"Address Updated\"}}}"
 
   @doc """

@@ -62,6 +62,13 @@ defmodule CatalogApiTest do
       end
     end
 
+    test "returns a :not_found error tuple when CatalogApi indicates item does not exist" do
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, Fixture.no_item_fault()} end] do
+        response = CatalogApi.view_item(123, 456)
+        assert {:error, :item_not_found} = response
+      end
+    end
+
     test "returns an error tuple with a fault struct when CatalogApi responds with a fault" do
       with_mock HTTPoison, [get: fn(_url) -> {:ok, @fault_response} end] do
         response = CatalogApi.view_item(123, 456)

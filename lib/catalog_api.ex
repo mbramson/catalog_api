@@ -57,6 +57,12 @@ defmodule CatalogApi do
   end
   defp extract_page_info(_), do: {:error, :unparseable_catalog_api_page_info}
 
+  @spec view_item(integer(), integer() | String.t) ::
+    {:ok, %{item: Item.t()}}
+    | {:error, {:bad_status, integer()}}
+    | {:error, {:catalog_api_fault, Error.extracted_fault}}
+    | {:error, Poison.ParseError.t}
+    | {:error, {:not_found, String.t}}
   def view_item(socket_id, catalog_item_id) do
     params = %{socket_id: socket_id, catalog_item_id: catalog_item_id}
     url = Url.url_for("view_item", params)
@@ -65,6 +71,11 @@ defmodule CatalogApi do
          {:ok, json} <- parse_json(response.body),
          {:ok, item} <- Item.extract_items_from_json(json) do
       {:ok, %{item: item}}
+    else
+      {:error, {:catalog_api_fault,
+        %Fault{faultstring: "Invalid catalog_item_id:" <> _}}} ->
+        {:error, :item_not_found}
+      other -> other
     end
   end
 
