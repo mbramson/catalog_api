@@ -28,7 +28,7 @@ defmodule CatalogApiTest do
 
   @fault_response Fixture.fault(true)
 
-  @internal_error_response Fixture.internal_error_response()
+  @internal_error_response Fixture.internal_error()
 
   describe "search_catalog/2" do
     test "returns a list of items and page info upon success" do
@@ -49,7 +49,7 @@ defmodule CatalogApiTest do
     test "returns an error tuple when CatalogApi responds with an internal server error" do
       with_mock HTTPoison, [get: fn(_url) -> {:ok, @internal_error_response} end] do
         response = CatalogApi.search_catalog(123)
-        assert {:error, {:bad_status, 500}} = response
+        assert {:error, {:bad_catalog_api_status, 500}} = response
       end
     end
   end
@@ -79,7 +79,7 @@ defmodule CatalogApiTest do
     test "returns an error tuple when CatalogApi responds with an internal server error" do
       with_mock HTTPoison, [get: fn(_url) -> {:ok, @internal_error_response} end] do
         response = CatalogApi.view_item(123, 456)
-        assert {:error, {:bad_status, 500}} = response
+        assert {:error, {:bad_catalog_api_status, 500}} = response
       end
     end
   end
@@ -110,7 +110,7 @@ defmodule CatalogApiTest do
     test "returns an error tuple when CatalogApi responds with an internal server error" do
       with_mock HTTPoison, [get: fn(_url) -> {:ok, @internal_error_response} end] do
         response = CatalogApi.cart_set_address(123, 1, @valid_address)
-        assert {:error, {:bad_status, 500}} = response
+        assert {:error, {:bad_catalog_api_status, 500}} = response
       end
     end
   end
@@ -133,7 +133,7 @@ defmodule CatalogApiTest do
     test "returns an error tuple when CatalogApi responds with an internal server error" do
       with_mock HTTPoison, [get: fn(_url) -> {:ok, @internal_error_response} end] do
         response = CatalogApi.cart_add_item(123, 1, 456)
-        assert {:error, {:bad_status, 500}} = response
+        assert {:error, {:bad_catalog_api_status, 500}} = response
       end
     end
   end
@@ -181,7 +181,7 @@ defmodule CatalogApiTest do
     test "returns an error tuple when CatalogApi responds with an internal server error" do
       with_mock HTTPoison, [get: fn(_url) -> {:ok, @internal_error_response} end] do
         response = CatalogApi.cart_view(123, 1)
-        assert {:error, {:bad_status, 500}} = response
+        assert {:error, {:bad_catalog_api_status, 500}} = response
       end
     end
   end
@@ -233,7 +233,7 @@ defmodule CatalogApiTest do
     test "returns an error tuple when CatalogApi responds with an internal server error" do
       with_mock HTTPoison, [get: fn(_url) -> {:ok, @internal_error_response} end] do
         response = CatalogApi.cart_order_place(1061, 1)
-        assert {:error, {:bad_status, 500}} = response
+        assert {:error, {:bad_catalog_api_status, 500}} = response
       end
     end
   end

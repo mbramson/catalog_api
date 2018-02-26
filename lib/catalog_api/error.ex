@@ -14,7 +14,7 @@ defmodule CatalogApi.Error do
       200 -> :ok
       201 -> :ok
       400 -> {:error, {:catalog_api_fault, extract_fault(response)}}
-      status -> {:error, {:bad_status, status}}
+      status -> {:error, {:bad_catalog_api_status, status}}
     end
   end
 

@@ -56,7 +56,7 @@ defmodule CatalogApi.ErrorTest do
         request_url: "",
         status_code: 500
       }
-      assert {:error, {:bad_status, 500}} =
+      assert {:error, {:bad_catalog_api_status, 500}} =
         Error.validate_response_status(catalog_response)
     end
 
