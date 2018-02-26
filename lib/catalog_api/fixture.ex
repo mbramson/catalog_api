@@ -39,8 +39,8 @@ defmodule CatalogApi.Fixture do
   @doc """
   Returns a `%HTTPPoison.Response{}` struct with a 500 status code.
   """
-  @spec internal_error_response() :: Response.t
-  def internal_error_response, do: @internal_error_json |> as_response(500)
+  @spec internal_error() :: Response.t
+  def internal_error, do: @internal_error_json |> as_response(500)
 
   @search_catalog_success_json "{\"search_catalog_response\": {\"search_catalog_result\": {\"items\": {\"CatalogItem\": [{\"original_price\": \"11.42\", \"catalog_price\": \"11.42\", \"image_300\": \"https://dck0i7x64ch95.cloudfront.net/asset/b/3/e/b3ead5dc9d8e3b4e39ff4a27e3a183ac_300_.jpg\", \"name\": \"Brown Bear, Brown Bear, What Do You See?: 50th Anniversary Edition\", \"tags\": {\"string\": []}, \"brand\": \"Henry Holt & Company\", \"categories\": {\"integer\": [156, 179]}, \"rank\": 300, \"options\": {}, \"catalog_item_id\": 1168951, \"currency\": \"USD\", \"points\": 229, \"shipping_estimate\": \"4.00\", \"image_150\": \"https://dck0i7x64ch95.cloudfront.net/asset/b/3/e/b3ead5dc9d8e3b4e39ff4a27e3a183ac_150_.jpg\", \"original_points\": 229, \"retail_price\": \"7.95\", \"has_options\": 0, \"model\": \"9780805047905\", \"image_75\": \"https://dck0i7x64ch95.cloudfront.net/asset/b/3/e/b3ead5dc9d8e3b4e39ff4a27e3a183ac_75_.jpg\"}]}, \"pager\": {\"has_next\": 0, \"sort\": \"score desc\", \"page\": 1, \"first_page\": 1, \"last_page\": 1, \"has_previous\": 0, \"per_page\": 10, \"pages\": {\"integer\": [1]}, \"result_count\": 1}, \"credentials\": {\"checksum\": \"Cyawkogo/jPEmTZMD89TqQCUmkc=\", \"method\": \"search_catalog\", \"uuid\": \"5b58c232-5d2b-4bad-be28-1aeed14c6c88\", \"datetime\": \"2018-02-17T23:55:08.262679+00:00\"}}}}"
 
