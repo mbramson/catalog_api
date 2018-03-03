@@ -4,6 +4,7 @@ defmodule CatalogApi do
   """
 
   alias CatalogApi.Address
+  alias CatalogApi.CartItem
   alias CatalogApi.Coercion
   alias CatalogApi.Error
   alias CatalogApi.Fault
@@ -245,7 +246,8 @@ defmodule CatalogApi do
   @doc """
   Returns the contents of the specified user's shopping cart.
 
-  The return contains the list of items in the cart.
+  The return contains the list of items in the cart casted as
+  `CatalogApi.CartItem{}` structs.
 
   The return also returns a map under the :status key which contains some
   information about the status of the cart. The keys contained in this map are
@@ -272,10 +274,9 @@ defmodule CatalogApi do
     with {:ok, response} <- HTTPoison.get(url),
          :ok <- Error.validate_response_status(response),
          {:ok, json} <- parse_json(response.body),
-         {:ok, items} <- Item.extract_items_from_json(json),
+         {:ok, items} <- CartItem.extract_items_from_json(json),
          {:ok, cart_status} <- extract_cart_status(json) do
       # TODO: Also extract cart's address information and return it
-      # TODO: Ensure item is casted as a CartItem
       {:ok, %{items: items, status: cart_status}}
     end
   end

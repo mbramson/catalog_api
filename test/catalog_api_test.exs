@@ -4,6 +4,7 @@ defmodule CatalogApiTest do
 
   import Mock
 
+  alias CatalogApi.CartItem
   alias CatalogApi.Fault
   alias CatalogApi.Fixture
   alias CatalogApi.Item
@@ -123,6 +124,9 @@ defmodule CatalogApiTest do
       end
     end
 
+    # TODO: Add a test for when add_item fails because the item does not exist
+    # This should have a custom return.
+
     test "returns an error tuple with a fault struct when CatalogApi responds with a fault" do
       with_mock HTTPoison, [get: fn(_url) -> {:ok, @fault_response} end] do
         response = CatalogApi.cart_add_item(123, 1, 456)
@@ -144,7 +148,7 @@ defmodule CatalogApiTest do
         response = CatalogApi.cart_view(123, 1)
         assert {:ok, %{items: items, status: status}} = response
 
-        Enum.map(items, &(assert %Item{} = &1))
+        Enum.map(items, &(assert %CartItem{} = &1))
 
         assert status[:error] == ""
         assert status[:has_item_errors] == false
@@ -160,7 +164,7 @@ defmodule CatalogApiTest do
         response = CatalogApi.cart_view(123, 1)
         assert {:ok, %{items: items, status: status}} = response
 
-        Enum.map(items, &(assert %Item{} = &1))
+        Enum.map(items, &(assert %CartItem{} = &1))
 
         assert status[:error] == "The cart requires an address. "
         assert status[:has_item_errors] == false
