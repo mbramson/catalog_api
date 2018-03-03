@@ -4,6 +4,7 @@ defmodule CatalogApiTest do
 
   import Mock
 
+  alias CatalogApi.CartItem
   alias CatalogApi.Fault
   alias CatalogApi.Fixture
   alias CatalogApi.Item
@@ -147,7 +148,7 @@ defmodule CatalogApiTest do
         response = CatalogApi.cart_view(123, 1)
         assert {:ok, %{items: items, status: status}} = response
 
-        Enum.map(items, &(assert %Item{} = &1))
+        Enum.map(items, &(assert %CartItem{} = &1))
 
         assert status[:error] == ""
         assert status[:has_item_errors] == false
@@ -163,7 +164,7 @@ defmodule CatalogApiTest do
         response = CatalogApi.cart_view(123, 1)
         assert {:ok, %{items: items, status: status}} = response
 
-        Enum.map(items, &(assert %Item{} = &1))
+        Enum.map(items, &(assert %CartItem{} = &1))
 
         assert status[:error] == "The cart requires an address. "
         assert status[:has_item_errors] == false
