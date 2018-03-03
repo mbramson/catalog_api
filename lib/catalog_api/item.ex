@@ -7,8 +7,6 @@ defmodule CatalogApi.Item do
   alias CatalogApi.Coercion
   alias CatalogApi.Item
 
-  #TODO: Separate item struct for item in cart, as there are additional fields.
-
   defstruct brand: nil,
             catalog_item_id: nil,
             catalog_price: nil,

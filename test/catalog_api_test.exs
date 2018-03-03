@@ -123,6 +123,9 @@ defmodule CatalogApiTest do
       end
     end
 
+    # TODO: Add a test for when add_item fails because the item does not exist
+    # This should have a custom return.
+
     test "returns an error tuple with a fault struct when CatalogApi responds with a fault" do
       with_mock HTTPoison, [get: fn(_url) -> {:ok, @fault_response} end] do
         response = CatalogApi.cart_add_item(123, 1, 456)
