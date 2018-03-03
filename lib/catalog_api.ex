@@ -37,7 +37,7 @@ defmodule CatalogApi do
   @doc """
   Searches for CatalogApi items which meet the specified criteria.
 
-  Requires a socket_id and a list of criteria that returned items must match.
+  Requires a `socket_id` and a list of criteria that returned items must match.
   All search parameters are optional.
 
   Allowed search parameters:
