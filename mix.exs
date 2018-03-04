@@ -4,7 +4,7 @@ defmodule CatalogApi.Mixfile do
   def project do
     [
       app: :catalog_api,
-      version: "0.0.6",
+      version: "0.0.7",
       elixir: "~> 1.3",
       elixirc_paths: elixirc_paths(Mix.env),
       build_embedded: Mix.env == :prod,
