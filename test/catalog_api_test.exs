@@ -175,6 +175,13 @@ defmodule CatalogApiTest do
       end
     end
 
+    test "returns no items if successful response indicating an empty cart" do
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, Fixture.cart_view_empty_cart_success()} end] do
+        response = CatalogApi.cart_view(123, 1)
+        assert {:ok, %{items: []}} = response
+      end
+    end
+
     test "returns an error tuple with a fault struct when CatalogApi responds with a fault" do
       with_mock HTTPoison, [get: fn(_url) -> {:ok, @fault_response} end] do
         response = CatalogApi.cart_view(123, 1)

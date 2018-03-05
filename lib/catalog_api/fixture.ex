@@ -153,6 +153,22 @@ defmodule CatalogApi.Fixture do
     end
   end
 
+  @cart_view_empty_cart_success "{\"cart_view_response\": {\"cart_view_result\": {\"credentials\": {\"checksum\": \"cnYAPXNzagegGC/1TWUwQhRoZCU=\", \"method\": \"cart_view\", \"uuid\": \"55470cc3-bf7d-453d-824e-faeaa922bf5b\", \"datetime\": \"2018-03-05T05:04:58.425254+00:00\"}, \"items\": {}}}}"
+
+  @doc """
+  Returns a `%HTTPPoison.Response{}` struct with a 200 status code and a body
+  which contains a response from CatalogAPI indicating that the shopping cart
+  is empty.
+
+  Returns only the body text if passed an argument of false to `as_response`.
+  """
+  def cart_view_empty_cart_success(as_response \\ true) do
+    case as_response do
+      true -> @cart_view_empty_cart_success_json |> as_response(200)
+      false -> @cart_view_empty_cart_success_json
+    end
+  end
+
   @cart_order_place_success_json "{\"cart_order_place_response\": {\"cart_order_place_result\": {\"credentials\": {\"checksum\": \"rgWGTavI1UmeSUczk1PkupRZTs8=\", \"method\": \"order_place\", \"uuid\": \"b015eb40-c880-4713-b771-4cd6481416f3\", \"datetime\": \"2018-02-18T20:52:31.406691+00:00\"}, \"order_number\": \"7151-11291-78980-0001\"}}}"
 
   @doc """
