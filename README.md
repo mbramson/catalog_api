@@ -17,7 +17,7 @@ dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:catalog_api, "~> 0.0.7"}
+    {:catalog_api, "~> 0.0.8"}
   ]
 end
 ```
