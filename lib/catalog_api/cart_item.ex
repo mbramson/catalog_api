@@ -64,7 +64,6 @@ defmodule CatalogApi.CartItem do
     %{"cart_view_response" => %{"cart_view_result" => %{"items" => %{}}}}) do
     {:ok, []}
   end
-
   def extract_items_from_json(_), do: {:error, :unparseable_catalog_api_items}
 
   defp to_struct(map), do: struct(CartItem, map)
