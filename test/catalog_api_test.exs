@@ -178,7 +178,7 @@ defmodule CatalogApiTest do
     test "returns no items if successful response indicating an empty cart" do
       with_mock HTTPoison, [get: fn(_url) -> {:ok, Fixture.cart_view_empty_cart_success()} end] do
         response = CatalogApi.cart_view(123, 1)
-        assert {:ok, %{items: []}} = response
+        assert {:ok, %{items: [], status: :cart_status_unavailable}} = response
       end
     end
 
