@@ -60,6 +60,11 @@ defmodule CatalogApi.CartItem do
           %{"CartItem" => items}}}}) when is_list(items) do
     {:ok, Enum.map(items, fn item -> cast(item) end)}
   end
+  def extract_items_from_json(
+    %{"cart_view_response" => %{"cart_view_result" => %{"items" => %{}}}}) do
+    {:ok, []}
+  end
+
   def extract_items_from_json(_), do: {:error, :unparseable_catalog_api_items}
 
   defp to_struct(map), do: struct(CartItem, map)

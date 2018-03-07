@@ -153,7 +153,7 @@ defmodule CatalogApi.Fixture do
     end
   end
 
-  @cart_view_empty_cart_success "{\"cart_view_response\": {\"cart_view_result\": {\"credentials\": {\"checksum\": \"cnYAPXNzagegGC/1TWUwQhRoZCU=\", \"method\": \"cart_view\", \"uuid\": \"55470cc3-bf7d-453d-824e-faeaa922bf5b\", \"datetime\": \"2018-03-05T05:04:58.425254+00:00\"}, \"items\": {}}}}"
+  @cart_view_empty_cart_success_json "{\"cart_view_response\": {\"cart_view_result\": {\"credentials\": {\"checksum\": \"cnYAPXNzagegGC/1TWUwQhRoZCU=\", \"method\": \"cart_view\", \"uuid\": \"55470cc3-bf7d-453d-824e-faeaa922bf5b\", \"datetime\": \"2018-03-05T05:04:58.425254+00:00\"}, \"items\": {}}}}"
 
   @doc """
   Returns a `%HTTPPoison.Response{}` struct with a 200 status code and a body

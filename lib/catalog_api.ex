@@ -285,12 +285,15 @@ defmodule CatalogApi do
   defp extract_cart_status( %{"cart_view_response" => %{"cart_view_result" => params}}) do
     boolean_fields = ~w(has_item_errors is_valid locked needs_address)
 
-    %{"error" => error, "has_item_errors" => has_item_errors, "is_valid" => is_valid,
-      "cart_version" => cart_version, "locked" => locked, "needs_address" => needs_address}
-      = params |> Coercion.integer_fields_to_boolean(boolean_fields, true)
+    case params |> Coercion.integer_fields_to_boolean(boolean_fields, true) do
+      %{"error" => error, "has_item_errors" => has_item_errors,
+        "is_valid" => is_valid, "cart_version" => cart_version,
+        "locked" => locked, "needs_address" => needs_address} ->
 
-    {:ok, %{error: error, has_item_errors: has_item_errors, is_valid: is_valid,
-      cart_version: cart_version, locked: locked, needs_address: needs_address}}
+        {:ok, %{error: error, has_item_errors: has_item_errors, is_valid: is_valid,
+          cart_version: cart_version, locked: locked, needs_address: needs_address}}
+      _ -> {:ok, :cart_status_unavailable}
+    end
   end
   defp extract_cart_status(_), do: {:error, :unparseable_response_cart_status}
 
