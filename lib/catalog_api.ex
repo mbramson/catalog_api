@@ -267,7 +267,7 @@ defmodule CatalogApi do
     order has not changed since the application's state has been updated.
   """
   @spec cart_view(integer(), integer()) ::
-    {:ok, %{items: list(Item.t), status: map() | :unavailable_cart_status}} | {:error, atom()}
+    {:ok, %{items: list(Item.t), status: map() | :cart_status_unavailable}} | {:error, atom()}
   def cart_view(socket_id, external_user_id) do
     params = %{socket_id: socket_id, external_user_id: external_user_id}
     url = Url.url_for("cart_view", params)
