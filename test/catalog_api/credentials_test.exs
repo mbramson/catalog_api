@@ -28,7 +28,7 @@ defmodule CatalogApi.CredentialsTest do
   end
 
   describe "generate_checksum" do
-    test 'generates the correct checksum' do
+    test "generates the correct checksum" do
       method_name = "cart_view"
       uuid = "b93cee9d-dd04-4154-9b5a-8768971e72b8"
       datetime = "2013-01-01T01:30:00Z"
@@ -41,6 +41,21 @@ defmodule CatalogApi.CredentialsTest do
         checksum = Credentials.generate_checksum(method, uuid, datetime)
         assert :ok = is_valid_checksum(checksum)
       end
+    end
+
+    test "raises an error if no secret key is configured" do
+      # Ya... if there are flaky tests around secret_key, this is probably the reason :(
+      # Sorry future me.
+      Application.delete_env(:catalog_api, :secret_key)
+      method_name = "cart_view"
+      uuid = "b93cee9d-dd04-4154-9b5a-8768971e72b8"
+      datetime = "2013-01-01T01:30:00Z"
+
+      assert_raise RuntimeError, "No catalog_api secret_key supplied in configuration", fn ->
+        Credentials.generate_checksum(method_name, uuid, datetime)
+      end
+      
+      Application.put_env(:catalog_api, :secret_key, "1234567890")
     end
   end
 end
