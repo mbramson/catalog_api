@@ -338,6 +338,12 @@ defmodule CatalogApi do
     passed version matches the version of the current cart. This can be used to
     ensure that the state of the users cart in your application has not become
     stale before the order is placed.
+
+  If the `cart_order_place/3` is invoked with cart version which does not match
+  the current version of the cart, then an error tuple will be returned of the
+  format `{:error, :stale_cart_version}`. This can be useful to ensure that the
+  order being placed matches what the consuming application believes the current
+  state of the cart to be,
   """
   @spec cart_order_place(integer(), integer(), Keyword.t) ::
     {:ok, map()}
