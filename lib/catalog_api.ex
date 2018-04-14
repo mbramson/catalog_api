@@ -278,7 +278,6 @@ defmodule CatalogApi do
     url = Url.url_for("cart_view", params)
     with {:ok, response} <- HTTPoison.get(url),
          :ok <- Error.validate_response_status(response),
-         _ <- IO.inspect(response),
          {:ok, json} <- parse_json(response.body),
          {:ok, items} <- CartItem.extract_items_from_json(json),
          {:ok, cart_status} <- extract_cart_status(json) do
