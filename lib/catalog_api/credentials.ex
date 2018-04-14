@@ -69,9 +69,9 @@ defmodule CatalogApi.Credentials do
   """
   def generate_checksum(method_name, uuid, iso_8601_datetime) do
     message = method_name <> uuid <> iso_8601_datetime
-    key = Application.get_env(:catalog_api, :secret_key)
-
-    :crypto.hmac(:sha, key, message)
-    |> Base.encode64
+    case Application.get_env(:catalog_api, :secret_key) do
+      nil -> raise "No catalog_api secret_key supplied in configuration"
+      key -> :crypto.hmac(:sha, key, message) |> Base.encode64
+    end
   end
 end
