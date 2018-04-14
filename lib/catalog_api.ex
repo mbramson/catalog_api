@@ -343,7 +343,21 @@ defmodule CatalogApi do
     passed version matches the version of the current cart. This can be used to
     ensure that the state of the users cart in your application has not become
     stale before the order is placed.
+
+  If the `cart_order_place/3` is invoked with cart version which does not match
+  the current version of the cart, then an error tuple will be returned of the
+  format `{:error, :stale_cart_version}`. This can be useful to ensure that the
+  order being placed matches what the consuming application believes the current
+  state of the cart to be,
   """
+  @spec cart_order_place(integer(), integer(), Keyword.t) ::
+    {:ok, map()}
+    | {:error, :cart_not_found}
+    | {:error, :no_shipping_address}
+    | {:error, :stale_cart_version}
+    | {:error, {:bad_status, integer()}}
+    | {:error, {:catalog_api_fault, Error.extracted_fault}}
+    | {:error, Poison.ParseError.t}
   def cart_order_place(socket_id, external_user_id, opts \\ []) do
     allowed = [:cart_version]
     {:ok, optional_params} = filter_optional_params([], opts, allowed)
@@ -363,6 +377,9 @@ defmodule CatalogApi do
       {:error, {:catalog_api_fault,
         %Fault{faultstring: "A shipping address must be added to the cart."}}} ->
         {:error, :no_shipping_address}
+      {:error, {:catalog_api_fault,
+        %Fault{faultstring: "The given cart version does not match the cart."}}} ->
+        {:error, :stale_cart_version}
       other -> other
     end
   end
