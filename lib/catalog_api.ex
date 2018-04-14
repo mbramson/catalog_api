@@ -152,6 +152,10 @@ defmodule CatalogApi do
     | {:error, {:catalog_api_fault, Error.extracted_fault}}
     | {:error, Poison.ParseError.t}
     | {:error, :unparseable_response_description}
+  def cart_set_address(socket_id, external_user_id, address = %Address{}) do
+    address_params = Map.from_struct(address)
+    cart_set_address(socket_id, external_user_id, address_params)
+  end
   def cart_set_address(socket_id, external_user_id, address_params) do
     with :ok <- Address.validate_params(address_params) do
       params = address_params
@@ -267,7 +271,8 @@ defmodule CatalogApi do
     order has not changed since the application's state has been updated.
   """
   @spec cart_view(integer(), integer()) ::
-    {:ok, %{items: list(Item.t), status: map() | :cart_status_unavailable}} | {:error, atom()}
+    {:ok, %{items: list(Item.t), status: map() | :cart_status_unavailable}}
+    | {:error, atom()}
   def cart_view(socket_id, external_user_id) do
     params = %{socket_id: socket_id, external_user_id: external_user_id}
     url = Url.url_for("cart_view", params)

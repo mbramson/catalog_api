@@ -93,6 +93,14 @@ defmodule CatalogApiTest do
       end
     end
 
+    test "accepts a CatalogApi.Address struct" do
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, Fixture.cart_set_address_success()} end] do
+        valid_address = CatalogApi.Address.fake_valid_address()
+        response = CatalogApi.cart_set_address(123, 1, valid_address)
+        assert {:ok, %{description: "Address Updated"}} = response
+      end
+    end
+
     test "returns invalid address error tuple if address is not valid" do
       invalid_address = Map.put(@valid_address, :first_name, "")
       with_mock HTTPoison, [get: fn(_url) -> {:ok, @internal_error_response} end] do

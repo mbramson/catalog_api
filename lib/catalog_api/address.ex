@@ -173,6 +173,22 @@ defmodule CatalogApi.Address do
     end
   end
 
+  @doc """
+  Returns a valid fake address. Useful for testing.
+  """
+  @spec fake_valid_address() :: t()
+  def fake_valid_address do
+    %Address{
+      first_name: "John",
+      last_name: "Doe",
+      address_1: "123 Street Road",
+      city: "Cleveland",
+      state_province: "OH",
+      postal_code: "44444",
+      country: "US"
+    }
+  end
+
   # TODO: Think about validation for state_province. Through poking the API,
   # this can be anywhere between 1 and 50 alphanumeric characters despite the
   # CatalogApi docstring saying that it must be 2 characters for US states. I
