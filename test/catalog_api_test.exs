@@ -205,6 +205,13 @@ defmodule CatalogApiTest do
       end
     end
 
+    test "returns error tuple if the cart_version does not match current version" do
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, Fixture.bad_cart_version_fault()} end] do
+        response = CatalogApi.cart_order_place(1061, 1, cart_version: "abcdefg")
+        assert {:error, :stale_cart_version} = response
+      end
+    end
+
     test "returns an error tuple if the cart is not found" do
       body = "{\"Fault\": {\"faultcode\": \"Client.APIError\", \"faultstring\": \"Cart not found.\", \"detail\":null}}"
       catalog_response = %HTTPoison.Response{

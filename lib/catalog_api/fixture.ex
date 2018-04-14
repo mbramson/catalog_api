@@ -184,7 +184,7 @@ defmodule CatalogApi.Fixture do
     end
   end
 
-  @cart_order_place_bad_cart_version_json "{\"Fault\": {\"faultcode\": \"Client.APIError\", \"faultstring\": \"The given cart version does not match the cart.\", \"detail\": null}}"
+  @bad_cart_version_fault_json "{\"Fault\": {\"faultcode\": \"Client.APIError\", \"faultstring\": \"The given cart version does not match the cart.\", \"detail\": null}}"
 
   @doc """
   Returns a `%HttpPoison.Response{}` struct with a 400 status code and a body
@@ -193,10 +193,10 @@ defmodule CatalogApi.Fixture do
 
   Returns only the body text if passed an argument of false to `as_response`.
   """
-  def cart_order_place_bad_cart_version_json(as_response \\ true) do
+  def bad_cart_version_fault(as_response \\ true) do
     case as_response do
-      true -> @cart_order_place_bad_cart_version_json |> as_response(400)
-      false -> @cart_order_place_bad_cart_version_json
+      true -> @bad_cart_version_fault_json |> as_response(400)
+      false -> @bad_cart_version_fault_json
     end
   end
 
