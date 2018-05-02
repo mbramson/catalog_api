@@ -63,5 +63,8 @@ defmodule CatalogApi.Category do
     child_categories = raw_child_categories |> Enum.map(&cast/1)
     %{category | children: child_categories}
   end
+  defp cast_child_categories(%Category{children: %{}} = category) do
+    %{category | children: []}
+  end
   defp cast_child_categories(%Category{} = category), do: category
 end
