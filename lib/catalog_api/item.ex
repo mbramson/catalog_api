@@ -40,7 +40,7 @@ defmodule CatalogApi.Item do
   def cast(item_json) when is_map(item_json) do
     item_json
     |> filter_unknown_properties # To avoid dynamically creating atoms
-    |> Coercion.integer_fields_to_boolean(@boolean_fields)
+    |> Coercion.integer_fields_to_boolean(@boolean_fields, false)
     |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end)
     |> Enum.into(%{})
     |> to_struct
