@@ -53,11 +53,42 @@ defmodule CatalogApi.CategoryTest do
       assert child_category.parent_category_id == 123
     end
 
+    test "correctly formats children when children is a map" do
+      category_json = %{@base_category_json | "children" => %{}}
+      category = Category.cast(category_json)
+      assert %Category{} = category
+      assert [] = category.children
+    end
+
     test "does not add invalid keys" do
       json = Map.put(@base_category_json, "bad_param", 123)
       result = Category.cast(json)
       refute Map.get(result, :bad_param)
       refute Map.get(result, "bad_param")
     end
+  end
+
+  describe "extract_items_from_json/1" do
+    test "extracts a cetegory from the catalog_breakdown response" do
+      json = %{"catalog_breakdown_response" =>
+        %{"catalog_breakdown_result" =>
+          %{"categories" =>
+            %{"Category" => [@base_category_json]}}}}
+      assert {:ok, [category]} = Category.extract_categories_from_json(json)
+      assert %Category{} = category
+      assert category.category_id == 123
+      assert category.children == []
+      assert category.depth == 2
+      assert category.item_count == 99
+      assert category.name == "video games"
+      assert category.parent_category_id == 0
+    end
+
+    test "returns an error tuple if structure is not parseable" do
+      assert {:error, :unparseable_catalog_api_categories} =
+        Category.extract_categories_from_json(%{})
+
+    end
+
   end
 end

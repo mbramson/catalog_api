@@ -57,7 +57,7 @@ defmodule CatalogApi.Item do
       %{"search_catalog_result" =>
         %{"items" =>
           %{"CatalogItem" => items}}}}) when is_list(items) do
-    {:ok, Enum.map(items, fn item -> cast(item) end)}
+    {:ok, Enum.map(items, &cast/1)}
   end
   def extract_items_from_json(_), do: {:error, :unparseable_catalog_api_items}
 
