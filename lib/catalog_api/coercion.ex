@@ -2,7 +2,7 @@ defmodule CatalogApi.Coercion do
   @moduledoc false
 
   @spec integer_fields_to_boolean(map(), list(String.t | atom()), boolean()) :: map()
-  def integer_fields_to_boolean(map, boolean_fields, return_map \\ false) do
+  def integer_fields_to_boolean(map, boolean_fields, return_map \\ true) do
     fields = Enum.map(map, fn {k, v} -> coerce_to_boolean_if_needed(k, v, boolean_fields) end)
     if return_map do
       fields |> Enum.into(%{})
@@ -27,7 +27,7 @@ defmodule CatalogApi.Coercion do
   defp coerce_integer_to_boolean(_), do: {:error, :failed_boolean_coercion}
 
   @spec boolean_fields_to_integer(map(), list(String.t | atom()), boolean()) :: map()
-  def boolean_fields_to_integer(map, boolean_fields, return_map \\ false) do
+  def boolean_fields_to_integer(map, boolean_fields, return_map \\ true) do
     fields = Enum.map(map, fn {k,v} -> coerce_to_integer_if_needed(k, v, boolean_fields) end)
     if return_map do
       fields |> Enum.into(%{})

@@ -43,7 +43,7 @@ defmodule CatalogApi do
     required_params = %{socket_id: socket_id}
     params = optional_params
              |> Map.merge(required_params)
-             |> Coercion.boolean_fields_to_integer([:is_flat], true)
+             |> Coercion.boolean_fields_to_integer([:is_flat])
 
     url = Url.url_for("catalog_breakdown", params)
     with {:ok, response} <- HTTPoison.get(url),
@@ -313,7 +313,7 @@ defmodule CatalogApi do
   defp extract_cart_status( %{"cart_view_response" => %{"cart_view_result" => params}}) do
     boolean_fields = ~w(has_item_errors is_valid locked needs_address)
 
-    case params |> Coercion.integer_fields_to_boolean(boolean_fields, true) do
+    case params |> Coercion.integer_fields_to_boolean(boolean_fields) do
       %{"error" => error, "has_item_errors" => has_item_errors,
         "is_valid" => is_valid, "cart_version" => cart_version,
         "locked" => locked, "needs_address" => needs_address} ->
