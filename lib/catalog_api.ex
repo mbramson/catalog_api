@@ -5,6 +5,7 @@ defmodule CatalogApi do
 
   alias CatalogApi.Address
   alias CatalogApi.CartItem
+  alias CatalogApi.Category
   alias CatalogApi.Coercion
   alias CatalogApi.Error
   alias CatalogApi.Fault
@@ -47,8 +48,9 @@ defmodule CatalogApi do
     url = Url.url_for("catalog_breakdown", params)
     with {:ok, response} <- HTTPoison.get(url),
          :ok <- Error.validate_response_status(response),
-         {:ok, json} <- parse_json(response.body) do
-      {:ok, json}
+         {:ok, json} <- parse_json(response.body),
+         {:ok, categories} <- Category.extract_categories_from_json(json) do
+      {:ok, categories}
     end
   end
 
