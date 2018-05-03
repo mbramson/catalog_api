@@ -5,8 +5,10 @@ defmodule CatalogApiTest do
   import Mock
 
   alias CatalogApi.CartItem
+  alias CatalogApi.Category
   alias CatalogApi.Fault
   alias CatalogApi.Fixture
+  alias CatalogApi.FixtureHelper
   alias CatalogApi.Item
 
   @response_headers [
@@ -30,6 +32,32 @@ defmodule CatalogApiTest do
   @fault_response Fixture.fault(true)
 
   @internal_error_response Fixture.internal_error()
+
+
+  describe "catalog_breakdown/2" do
+    test "returns a list of categories upon success" do
+      response_fixture = FixtureHelper.retrieve_json_response "catalog_breakdown_success"
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, response_fixture} end] do
+        response = CatalogApi.catalog_breakdown(123)
+        assert {:ok, categories} = response
+        Enum.map(categories, &(assert %Category{} = &1))
+      end
+    end
+
+    test "returns an error tuple with a fault struct when CatalogApi responds with a fault" do
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, @fault_response} end] do
+        response = CatalogApi.catalog_breakdown(123)
+        assert {:error, {:catalog_api_fault, %Fault{}}} = response
+      end
+    end
+
+    test "returns an error tuple when CatalogApi responds with an internal server error" do
+      with_mock HTTPoison, [get: fn(_url) -> {:ok, @internal_error_response} end] do
+        response = CatalogApi.catalog_breakdown(123)
+        assert {:error, {:bad_catalog_api_status, 500}} = response
+      end
+    end
+  end
 
   describe "search_catalog/2" do
     test "returns a list of items and page info upon success" do

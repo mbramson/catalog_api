@@ -72,6 +72,5 @@ defmodule CatalogApi.ItemTest do
       assert ^error = Item.extract_items_from_json(%{})
       assert ^error = Item.extract_items_from_json([])
     end
-
   end
 end
