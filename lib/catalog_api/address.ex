@@ -41,6 +41,31 @@ defmodule CatalogApi.Address do
   @type t :: %Address{}
   @type invalid_address_error :: {:invalid_address, list({atom(), list(String.t)})}
 
+  @valid_fields ~w(first_name last_name address_1 address_2 address_3 city
+    state_province postal_code country email phone_number)
+
+  @spec cast(map()) :: t
+  def cast(address_json) when is_map(address_json) do
+    address_json
+    |> filter_unknown_properties # To avoid dynamically creating atoms
+    |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end)
+    |> Enum.into(%{})
+    |> to_struct!
+  end
+
+  defp filter_unknown_properties(map) do
+    Enum.filter(map, fn {k, _v} -> k in @valid_fields end)
+  end
+
+  defp to_struct!(map), do: struct(Address, map)
+
+  def extract_address_from_json(
+    %{"cart_view_response" =>
+      %{"cart_view_result" => maybe_address}}) do
+        {:ok, cast(maybe_address)}
+  end
+  def extract_address_from_json(_), do: {:error, :unparseable_catalog_api_address}
+
   @doc """
   Validates a map with string or atom keys that is intended to represent a
   CatalogApi address.

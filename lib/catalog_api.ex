@@ -276,6 +276,11 @@ defmodule CatalogApi do
   The return contains the list of items in the cart casted as
   `CatalogApi.CartItem{}` structs.
 
+  Also returns the address associated with the cart in the form of a
+  `%CatalogApi.Address{}` struct. If there is no address associated with the
+  given cart, then this still returns a `%CatalogApi.Address{}` struct, but the
+  keys are all empty strings.
+
   The return also returns a map under the :status key which contains some
   information about the status of the cart. The keys contained in this map are
   as follows:
@@ -292,6 +297,74 @@ defmodule CatalogApi do
   - `cart_version`: A String uuid indicating the current version of the cart.
     This can be used to ensure that the cart which is being used to place an
     order has not changed since the application's state has been updated.
+
+  ## Examples
+
+      iex> CatalogApi.cart_view(1000, 500)
+      {:ok,
+       %{
+         address: %CatalogApi.Address{
+           address_1: "123 st",
+           address_2: "",
+           address_3: "",
+           city: "cleveland",
+           country: "US",
+           email: "",
+           first_name: "john",
+           last_name: "gotty",
+           phone_number: "",
+           postal_code: "44444",
+           state_province: "OH"
+         },
+         items: [
+           %CatalogApi.CartItem{
+             cart_price: "50.00",
+             catalog_item_id: 3870422,
+             catalog_points: 1000,
+             catalog_price: "50.00",
+             currency: "USD",
+             error: "",
+             image_uri: "https://dck0i7x64ch95.cloudfront.net/asset/1/8/9/189373b3846ed28cb788f1051b2af5db_75_.jpg",
+             is_available: true,
+             is_valid: true,
+             name: "Marshalls® eGift Card $50",
+             points: 1000,
+             quantity: 2,
+             retail_price: "50.00",
+             shipping_estimate: "0.00"
+           }
+         ],
+         status: %{
+           cart_version: "5dd19634-e2b9-4c35-a9ec-9453a59ec22b",
+           error: "",
+           has_item_errors: false,
+           is_valid: true,
+           locked: false,
+           needs_address: false
+         }
+       }}
+
+  In the event that the cart is empty, the response will look a bit different:
+
+      iex> CatalogApi.cart_view(1000, 99999)
+      {:ok,
+       %{
+         address: %CatalogApi.Address{
+           address_1: "",
+           address_2: "",
+           address_3: "",
+           city: "",
+           country: "",
+           email: "",
+           first_name: "",
+           last_name: "",
+           phone_number: "",
+           postal_code: "",
+           state_province: ""
+         },
+         items: [],
+         status: :cart_status_unavailable
+       }}
   """
   @spec cart_view(integer(), integer()) ::
     {:ok, %{items: list(Item.t), status: map() | :cart_status_unavailable}}
@@ -303,9 +376,9 @@ defmodule CatalogApi do
          :ok <- Error.validate_response_status(response),
          {:ok, json} <- parse_json(response.body),
          {:ok, items} <- CartItem.extract_items_from_json(json),
+         {:ok, address} <- Address.extract_address_from_json(json),
          {:ok, cart_status} <- extract_cart_status(json) do
-      # TODO: Also extract cart's address information and return it
-      {:ok, %{items: items, status: cart_status}}
+      {:ok, %{items: items, address: address, status: cart_status}}
     end
   end
 
