@@ -12,6 +12,7 @@ defmodule CatalogApi.Item do
             catalog_price: nil,
             categories: %{}, # TODO Can default be more specific?
             currency: nil,
+            description: nil,
             has_options: false,
             image_75: nil,
             image_150: nil,
@@ -30,8 +31,9 @@ defmodule CatalogApi.Item do
   @type t :: %CatalogApi.Item{}
 
   @valid_fields ~w(brand catalog_item_id catalog_price categories currency
-    has_options image_75 image_150 image_300 model name options original_points
-    original_price points rank retail_price shipping_estimate tags)
+    description has_options image_75 image_150 image_300 model name options
+    original_points original_price points rank retail_price shipping_estimate
+    tags)
 
   @boolean_fields ~w(has_options)
 
