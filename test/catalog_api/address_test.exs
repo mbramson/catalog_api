@@ -27,6 +27,19 @@ defmodule CatalogApi.AddressTest do
                                postal_code: "44444",
                                country: "US"}
 
+  describe "cast/1" do
+    test "produces Item struct from json" do
+      assert %Address{} = Address.cast(@valid_address_params)
+    end
+
+    test "does not add invalid keys" do
+      json = Map.put(@valid_address_params, "bad_param", 123)
+      result = Address.cast(json)
+      refute Map.get(result, :bad_param)
+      refute Map.get(result, "bad_param")
+    end
+  end
+
   describe "validate_params" do
     test "returns :ok for valid address params" do
       assert :ok = Address.validate_params(@valid_address_params)
