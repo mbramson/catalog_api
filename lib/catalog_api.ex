@@ -5,6 +5,7 @@ defmodule CatalogApi do
 
   alias CatalogApi.Address
   alias CatalogApi.CartItem
+  alias CatalogApi.Category
   alias CatalogApi.Coercion
   alias CatalogApi.Error
   alias CatalogApi.Fault
@@ -19,16 +20,38 @@ defmodule CatalogApi do
     HTTPoison.get(url)
   end
 
-  @valid_catalog_breakdown_keys ~w(socket_id is_flat tag)
-  def catalog_breakdown(socket_id, opts \\ %{}) do
-    required_params = %{socket_id: socket_id}
-    params = merge_required_filter_invalid(opts, required_params,
-      @valid_catalog_breakdown_keys)
+  @doc """
+  Returns a list of all item categories for the given socket_id.
 
-    #TODO convert is_flat boolean to "1" or "0"
+  Requires a `socket_id`.
+
+  There are two optional parameters which can be supplied:
+
+  - `is_flat`: If true, the returned categories are in a flat list. If false or
+    not supplied as an option, then the categories are returned in a nested
+    format.
+
+  - `tags`: Can specify tags which narrow down the categories. The official
+    documentation explains: We have the ability to "tag" certain items based on
+    custom criteria that is unique to our clients. If we setup these tags on your
+    catalog, you can pass a tag name to receive back only categories that contain
+    items matching the tag.
+  """
+  def catalog_breakdown(socket_id, opts \\ []) do
+    allowed = [:is_flat, :tag]
+    {:ok, optional_params} = filter_optional_params([], opts, allowed)
+    required_params = %{socket_id: socket_id}
+    params = optional_params
+             |> Map.merge(required_params)
+             |> Coercion.boolean_fields_to_integer([:is_flat])
 
     url = Url.url_for("catalog_breakdown", params)
-    HTTPoison.get(url)
+    with {:ok, response} <- HTTPoison.get(url),
+         :ok <- Error.validate_response_status(response),
+         {:ok, json} <- parse_json(response.body),
+         {:ok, categories} <- Category.extract_categories_from_json(json) do
+      {:ok, categories}
+    end
   end
 
   @valid_search_catalog_keys ~w(socket_id name search category_id min_points
@@ -290,7 +313,7 @@ defmodule CatalogApi do
   defp extract_cart_status( %{"cart_view_response" => %{"cart_view_result" => params}}) do
     boolean_fields = ~w(has_item_errors is_valid locked needs_address)
 
-    case params |> Coercion.integer_fields_to_boolean(boolean_fields, true) do
+    case params |> Coercion.integer_fields_to_boolean(boolean_fields) do
       %{"error" => error, "has_item_errors" => has_item_errors,
         "is_valid" => is_valid, "cart_version" => cart_version,
         "locked" => locked, "needs_address" => needs_address} ->

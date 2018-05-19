@@ -40,7 +40,7 @@ defmodule CatalogApi.Item do
   def cast(item_json) when is_map(item_json) do
     item_json
     |> filter_unknown_properties # To avoid dynamically creating atoms
-    |> Coercion.integer_fields_to_boolean(@boolean_fields)
+    |> Coercion.integer_fields_to_boolean(@boolean_fields, false)
     |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end)
     |> Enum.into(%{})
     |> to_struct
@@ -57,7 +57,7 @@ defmodule CatalogApi.Item do
       %{"search_catalog_result" =>
         %{"items" =>
           %{"CatalogItem" => items}}}}) when is_list(items) do
-    {:ok, Enum.map(items, fn item -> cast(item) end)}
+    {:ok, Enum.map(items, &cast/1)}
   end
   def extract_items_from_json(_), do: {:error, :unparseable_catalog_api_items}
 
