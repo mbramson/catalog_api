@@ -1,9 +1,9 @@
 defmodule CatalogApiTest do
   use ExUnit.Case, async: false
-  doctest CatalogApi
 
   import Mock
 
+  alias CatalogApi.Address
   alias CatalogApi.CartItem
   alias CatalogApi.Category
   alias CatalogApi.Fault
@@ -182,9 +182,11 @@ defmodule CatalogApiTest do
     test "returns items in cart and the cart status for a successful response" do
       with_mock HTTPoison, [get: fn(_url) -> {:ok, Fixture.cart_view_success()} end] do
         response = CatalogApi.cart_view(123, 1)
-        assert {:ok, %{items: items, status: status}} = response
+        assert {:ok, %{items: items, address: address, status: status}} = response
 
         Enum.map(items, &(assert %CartItem{} = &1))
+
+        assert %Address{} = address
 
         assert status[:error] == ""
         assert status[:has_item_errors] == false
@@ -198,9 +200,11 @@ defmodule CatalogApiTest do
     test "returns items in cart if successful response but no address info" do
       with_mock HTTPoison, [get: fn(_url) -> {:ok, Fixture.cart_view_no_address_success()} end] do
         response = CatalogApi.cart_view(123, 1)
-        assert {:ok, %{items: items, status: status}} = response
+        assert {:ok, %{items: items, address: address, status: status}} = response
 
         Enum.map(items, &(assert %CartItem{} = &1))
+
+        assert %Address{} = address
 
         assert status[:error] == "The cart requires an address. "
         assert status[:has_item_errors] == false
@@ -214,7 +218,9 @@ defmodule CatalogApiTest do
     test "returns no items if successful response indicating an empty cart" do
       with_mock HTTPoison, [get: fn(_url) -> {:ok, Fixture.cart_view_empty_cart_success()} end] do
         response = CatalogApi.cart_view(123, 1)
-        assert {:ok, %{items: [], status: :cart_status_unavailable}} = response
+        assert {:ok, %{items: [], address: address, status: :cart_status_unavailable}} = response
+
+        assert %Address{} = address
       end
     end
 

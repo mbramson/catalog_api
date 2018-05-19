@@ -59,6 +59,13 @@ defmodule CatalogApi.Address do
 
   defp to_struct!(map), do: struct(Address, map)
 
+  def extract_address_from_json(
+    %{"cart_view_response" =>
+      %{"cart_view_result" => maybe_address}}) do
+        {:ok, cast(maybe_address)}
+  end
+  def extract_address_from_json(_), do: {:error, :unparseable_catalog_api_address}
+
   @doc """
   Validates a map with string or atom keys that is intended to represent a
   CatalogApi address.
