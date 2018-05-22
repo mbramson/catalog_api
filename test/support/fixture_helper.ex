@@ -1,5 +1,4 @@
 defmodule CatalogApi.FixtureHelper do
-
   @response_headers [
     {"Access-Control-Allow-Methods", "GET"},
     {"Access-Control-Allow-Origin", "*"},
@@ -11,7 +10,7 @@ defmodule CatalogApi.FixtureHelper do
   ]
 
   def retrieve_fixture(fixture_name) do
-    file_path = File.cwd! <> "/test/fixtures/#{fixture_name}"
+    file_path = File.cwd!() <> "/test/fixtures/#{fixture_name}"
 
     case File.read(file_path) do
       {:ok, file} -> file
@@ -20,7 +19,7 @@ defmodule CatalogApi.FixtureHelper do
   end
 
   def retrieve_json_fixture(fixture_name) do
-    retrieve_fixture("#{fixture_name}.json") |> Poison.decode!
+    retrieve_fixture("#{fixture_name}.json") |> Poison.decode!()
   end
 
   def retrieve_json_response(fixture_name, status_code \\ 200) do

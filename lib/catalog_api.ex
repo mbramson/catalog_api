@@ -15,9 +15,24 @@ defmodule CatalogApi do
   # TODO add param validation
   # TODO add response parsing
 
+  @doc """
+  Returns a list of the domains tied to the used credentials and those domain's
+  sockets.
+
+  A domain is something tied to a specific account. This includes information about the account in general.
+
+  A domain (and by extension an account) can have multiple sockets. Each socket
+  represents a different catalog of items, point exchange rates, currency,
+  language, among other information.
+  """
   def list_available_catalogs() do
     url = Url.url_for("list_available_catalogs")
-    HTTPoison.get(url)
+
+    with {:ok, response} <- HTTPoison.get(url),
+         :ok <- Error.validate_response_status(response),
+         {:ok, json} <- parse_json(response.body) do
+      {:ok, json}
+    end
   end
 
   @doc """
@@ -41,11 +56,14 @@ defmodule CatalogApi do
     allowed = [:is_flat, :tag]
     {:ok, optional_params} = filter_optional_params([], opts, allowed)
     required_params = %{socket_id: socket_id}
-    params = optional_params
-             |> Map.merge(required_params)
-             |> Coercion.boolean_fields_to_integer([:is_flat])
+
+    params =
+      optional_params
+      |> Map.merge(required_params)
+      |> Coercion.boolean_fields_to_integer([:is_flat])
 
     url = Url.url_for("catalog_breakdown", params)
+
     with {:ok, response} <- HTTPoison.get(url),
          :ok <- Error.validate_response_status(response),
          {:ok, json} <- parse_json(response.body),
@@ -93,18 +111,18 @@ defmodule CatalogApi do
     in the given list
   """
   @spec search_catalog(integer(), map()) ::
-    {:ok, %{items: Item.t, page_info: map()}}
-    | {:error, {:bad_status, integer()}}
-    | {:error, {:catalog_api_fault, Error.extracted_fault}}
-    | {:error, Poison.ParseError.t}
+          {:ok, %{items: Item.t(), page_info: map()}}
+          | {:error, {:bad_status, integer()}}
+          | {:error, {:catalog_api_fault, Error.extracted_fault()}}
+          | {:error, Poison.ParseError.t()}
   def search_catalog(socket_id, opts \\ %{}) do
     required_params = %{socket_id: socket_id}
-    params = merge_required_filter_invalid(opts, required_params,
-      @valid_search_catalog_keys)
+    params = merge_required_filter_invalid(opts, required_params, @valid_search_catalog_keys)
 
-    #TODO validate each search parameter when used
+    # TODO validate each search parameter when used
 
     url = Url.url_for("search_catalog", params)
+
     with {:ok, response} <- HTTPoison.get(url),
          :ok <- Error.validate_response_status(response),
          {:ok, json} <- parse_json(response.body),
@@ -114,11 +132,12 @@ defmodule CatalogApi do
     end
   end
 
-  defp extract_page_info(%{"search_catalog_response" =>
-    %{"search_catalog_result" =>
-      %{"pager" => page_info}}}) do
+  defp extract_page_info(%{
+         "search_catalog_response" => %{"search_catalog_result" => %{"pager" => page_info}}
+       }) do
     {:ok, page_info}
   end
+
   defp extract_page_info(_), do: {:error, :unparseable_catalog_api_page_info}
 
   @doc """
@@ -131,25 +150,27 @@ defmodule CatalogApi do
   If the item does not exist, this returns an error tuple of the format
   `{:error, :item_not_found}`
   """
-  @spec view_item(integer(), integer() | String.t) ::
-    {:ok, %{item: Item.t()}}
-    | {:error, {:bad_status, integer()}}
-    | {:error, {:catalog_api_fault, Error.extracted_fault}}
-    | {:error, Poison.ParseError.t}
-    | {:error, :item_not_found}
+  @spec view_item(integer(), integer() | String.t()) ::
+          {:ok, %{item: Item.t()}}
+          | {:error, {:bad_status, integer()}}
+          | {:error, {:catalog_api_fault, Error.extracted_fault()}}
+          | {:error, Poison.ParseError.t()}
+          | {:error, :item_not_found}
   def view_item(socket_id, catalog_item_id) do
     params = %{socket_id: socket_id, catalog_item_id: catalog_item_id}
     url = Url.url_for("view_item", params)
+
     with {:ok, response} <- HTTPoison.get(url),
          :ok <- Error.validate_response_status(response),
          {:ok, json} <- parse_json(response.body),
          {:ok, item} <- Item.extract_items_from_json(json) do
       {:ok, %{item: item}}
     else
-      {:error, {:catalog_api_fault,
-        %Fault{faultstring: "Invalid catalog_item_id:" <> _}}} ->
+      {:error, {:catalog_api_fault, %Fault{faultstring: "Invalid catalog_item_id:" <> _}}} ->
         {:error, :item_not_found}
-      other -> other
+
+      other ->
+        other
     end
   end
 
@@ -169,20 +190,23 @@ defmodule CatalogApi do
   tuple without making a call to the CatalogApi endpoint.
   """
   @spec cart_set_address(integer(), integer(), map()) ::
-    {:ok, %{description: String.t}}
-    | {:error, Address.invalid_address_error}
-    | {:error, {:bad_status, integer()}}
-    | {:error, {:catalog_api_fault, Error.extracted_fault}}
-    | {:error, Poison.ParseError.t}
-    | {:error, :unparseable_response_description}
+          {:ok, %{description: String.t()}}
+          | {:error, Address.invalid_address_error()}
+          | {:error, {:bad_status, integer()}}
+          | {:error, {:catalog_api_fault, Error.extracted_fault()}}
+          | {:error, Poison.ParseError.t()}
+          | {:error, :unparseable_response_description}
   def cart_set_address(socket_id, external_user_id, address = %Address{}) do
     address_params = Map.from_struct(address)
     cart_set_address(socket_id, external_user_id, address_params)
   end
+
   def cart_set_address(socket_id, external_user_id, address_params) do
     with :ok <- Address.validate_params(address_params) do
-      params = address_params
+      params =
+        address_params
         |> Map.merge(%{socket_id: socket_id, external_user_id: external_user_id})
+
       url = Url.url_for("cart_set_address", params)
 
       with {:ok, response} <- HTTPoison.get(url),
@@ -196,11 +220,14 @@ defmodule CatalogApi do
 
   def cart_set_item_quantity(socket_id, external_user_id, catalog_item_id, option_id, quantity) do
     # TODO add option_id to optional params
-    params = %{socket_id: socket_id,
-               external_user_id: external_user_id,
-               catalog_item_id: catalog_item_id,
-               option_id: option_id,
-               quantity: quantity}
+    params = %{
+      socket_id: socket_id,
+      external_user_id: external_user_id,
+      catalog_item_id: catalog_item_id,
+      option_id: option_id,
+      quantity: quantity
+    }
+
     url = Url.url_for("cart_set_item_quantity", params)
     HTTPoison.get(url)
   end
@@ -220,12 +247,16 @@ defmodule CatalogApi do
     allowed = [:option_id, :quantity]
     {:ok, optional_params} = filter_optional_params(defaults, opts, allowed)
 
-    required_params = %{socket_id: socket_id,
-                        external_user_id: external_user_id,
-                        catalog_item_id: catalog_item_id}
+    required_params = %{
+      socket_id: socket_id,
+      external_user_id: external_user_id,
+      catalog_item_id: catalog_item_id
+    }
+
     params = Map.merge(optional_params, required_params)
 
     url = Url.url_for("cart_add_item", params)
+
     with {:ok, response} <- HTTPoison.get(url),
          :ok <- Error.validate_response_status(response),
          {:ok, json} <- parse_json(response.body),
@@ -235,20 +266,22 @@ defmodule CatalogApi do
   end
 
   @spec extract_description(map()) ::
-    {:ok, any()}
-    | {:error, :unparseable_response_description}
-  defp extract_description(
-    %{"cart_add_item_response" =>
-      %{"cart_add_item_result" =>
-        %{"description" => description}}}) do
+          {:ok, any()}
+          | {:error, :unparseable_response_description}
+  defp extract_description(%{
+         "cart_add_item_response" => %{"cart_add_item_result" => %{"description" => description}}
+       }) do
     {:ok, description}
   end
-  defp extract_description(
-    %{"cart_set_address_response" =>
-      %{"cart_set_address_result" =>
-        %{"description" => description}}}) do
+
+  defp extract_description(%{
+         "cart_set_address_response" => %{
+           "cart_set_address_result" => %{"description" => description}
+         }
+       }) do
     {:ok, description}
   end
+
   defp extract_description(_), do: {:error, :unparseable_response_description}
 
   def cart_remove_item(socket_id, external_user_id, catalog_item_id, option_id, quantity) do
@@ -259,7 +292,9 @@ defmodule CatalogApi do
       external_user_id: external_user_id,
       catalog_item_id: catalog_item_id,
       option_id: option_id,
-      quantity: quantity}
+      quantity: quantity
+    }
+
     url = Url.url_for("cart_remove_item", params)
     HTTPoison.get(url)
   end
@@ -367,11 +402,12 @@ defmodule CatalogApi do
        }}
   """
   @spec cart_view(integer(), integer()) ::
-    {:ok, %{items: list(Item.t), status: map() | :cart_status_unavailable}}
-    | {:error, atom()}
+          {:ok, %{items: list(Item.t()), status: map() | :cart_status_unavailable}}
+          | {:error, atom()}
   def cart_view(socket_id, external_user_id) do
     params = %{socket_id: socket_id, external_user_id: external_user_id}
     url = Url.url_for("cart_view", params)
+
     with {:ok, response} <- HTTPoison.get(url),
          :ok <- Error.validate_response_status(response),
          {:ok, json} <- parse_json(response.body),
@@ -383,19 +419,33 @@ defmodule CatalogApi do
   end
 
   @spec extract_cart_status(map()) :: {:ok, map()} | {:error, :unparseable_response_cart_status}
-  defp extract_cart_status( %{"cart_view_response" => %{"cart_view_result" => params}}) do
+  defp extract_cart_status(%{"cart_view_response" => %{"cart_view_result" => params}}) do
     boolean_fields = ~w(has_item_errors is_valid locked needs_address)
 
     case params |> Coercion.integer_fields_to_boolean(boolean_fields) do
-      %{"error" => error, "has_item_errors" => has_item_errors,
-        "is_valid" => is_valid, "cart_version" => cart_version,
-        "locked" => locked, "needs_address" => needs_address} ->
+      %{
+        "error" => error,
+        "has_item_errors" => has_item_errors,
+        "is_valid" => is_valid,
+        "cart_version" => cart_version,
+        "locked" => locked,
+        "needs_address" => needs_address
+      } ->
+        {:ok,
+         %{
+           error: error,
+           has_item_errors: has_item_errors,
+           is_valid: is_valid,
+           cart_version: cart_version,
+           locked: locked,
+           needs_address: needs_address
+         }}
 
-        {:ok, %{error: error, has_item_errors: has_item_errors, is_valid: is_valid,
-          cart_version: cart_version, locked: locked, needs_address: needs_address}}
-      _ -> {:ok, :cart_status_unavailable}
+      _ ->
+        {:ok, :cart_status_unavailable}
     end
   end
+
   defp extract_cart_status(_), do: {:error, :unparseable_response_cart_status}
 
   @doc """
@@ -409,10 +459,11 @@ defmodule CatalogApi do
   change relevant information after the transaction has been finalized.
   """
   def cart_validate(socket_id, external_user_id, locked \\ false) do
-    locked = case locked do
-      true  -> "1"
-      false -> "0"
-    end
+    locked =
+      case locked do
+        true -> "1"
+        false -> "0"
+      end
 
     params = %{socket_id: socket_id, external_user_id: external_user_id, locked: locked}
     url = Url.url_for("cart_validate", params)
@@ -446,14 +497,14 @@ defmodule CatalogApi do
   order being placed matches what the consuming application believes the current
   state of the cart to be,
   """
-  @spec cart_order_place(integer(), integer(), Keyword.t) ::
-    {:ok, map()}
-    | {:error, :cart_not_found}
-    | {:error, :no_shipping_address}
-    | {:error, :stale_cart_version}
-    | {:error, {:bad_status, integer()}}
-    | {:error, {:catalog_api_fault, Error.extracted_fault}}
-    | {:error, Poison.ParseError.t}
+  @spec cart_order_place(integer(), integer(), Keyword.t()) ::
+          {:ok, map()}
+          | {:error, :cart_not_found}
+          | {:error, :no_shipping_address}
+          | {:error, :stale_cart_version}
+          | {:error, {:bad_status, integer()}}
+          | {:error, {:catalog_api_fault, Error.extracted_fault()}}
+          | {:error, Poison.ParseError.t()}
   def cart_order_place(socket_id, external_user_id, opts \\ []) do
     allowed = [:cart_version]
     {:ok, optional_params} = filter_optional_params([], opts, allowed)
@@ -462,26 +513,31 @@ defmodule CatalogApi do
     params = Map.merge(optional_params, required_params)
 
     url = Url.url_for("cart_order_place", params)
+
     with {:ok, response} <- HTTPoison.get(url),
          :ok <- Error.validate_response_status(response),
          {:ok, json} <- parse_json(response.body) do
       {:ok, json}
     else
-      {:error, {:catalog_api_fault,
-        %Fault{faultstring: "Cart not found."}}} ->
+      {:error, {:catalog_api_fault, %Fault{faultstring: "Cart not found."}}} ->
         {:error, :cart_not_found}
-      {:error, {:catalog_api_fault,
-        %Fault{faultstring: "A shipping address must be added to the cart."}}} ->
+
+      {:error,
+       {:catalog_api_fault, %Fault{faultstring: "A shipping address must be added to the cart."}}} ->
         {:error, :no_shipping_address}
-      {:error, {:catalog_api_fault,
+
+      {:error,
+       {:catalog_api_fault,
         %Fault{faultstring: "The given cart version does not match the cart."}}} ->
         {:error, :stale_cart_version}
-      other -> other
+
+      other ->
+        other
     end
   end
 
   def order_place() do
-    #TODO this allows for an order placement all at once. Might not be needed.
+    # TODO this allows for an order placement all at once. Might not be needed.
   end
 
   @doc """
@@ -507,15 +563,11 @@ defmodule CatalogApi do
   """
   def order_list(external_user_id, opts \\ []) do
     defaults = [per_page: 10, page: 1]
-    %{per_page: per_page, page: page} =
-      Keyword.merge(defaults, opts) |> Enum.into(%{})
+    %{per_page: per_page, page: page} = Keyword.merge(defaults, opts) |> Enum.into(%{})
 
-    #TODO: validate that per_page is at most 50.
+    # TODO: validate that per_page is at most 50.
 
-    params = %{
-      external_user_id: external_user_id,
-      per_page: per_page,
-      page: page}
+    params = %{external_user_id: external_user_id, per_page: per_page, page: page}
 
     url = Url.url_for("order_list", params)
     HTTPoison.get(url)
@@ -524,7 +576,6 @@ defmodule CatalogApi do
   defp parse_json(json) do
     Poison.decode(json)
   end
-
 
   defp merge_required_filter_invalid(opts, required, valid_keys) do
     opts
@@ -549,16 +600,18 @@ defmodule CatalogApi do
     |> Enum.into(%{})
   end
 
-  @spec filter_optional_params(Keyword.t, Keyword.t, list(atom())) ::
-    {:ok, %{optional(atom()) => any()}} | {:error, :invalid_argument}
+  @spec filter_optional_params(Keyword.t(), Keyword.t(), list(atom())) ::
+          {:ok, %{optional(atom()) => any()}} | {:error, :invalid_argument}
   defp filter_optional_params(defaults, opts, allowed)
-    when is_list(defaults) and is_list(opts) and is_list(allowed) do
-    filtered_params = defaults
+       when is_list(defaults) and is_list(opts) and is_list(allowed) do
+    filtered_params =
+      defaults
       |> Keyword.merge(opts)
       |> Enum.filter(fn {k, _} -> k in allowed end)
       |> Enum.into(%{})
+
     {:ok, filtered_params}
   end
-  defp filter_optional_params(_, _, _), do: {:error, :invalid_argument}
 
+  defp filter_optional_params(_, _, _), do: {:error, :invalid_argument}
 end

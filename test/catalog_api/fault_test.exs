@@ -3,9 +3,11 @@ defmodule CatalogApi.FaultTest do
   doctest CatalogApi.Fault
   alias CatalogApi.Fault
 
-  @base_fault_json %{"detail" => "detailed error message",
-                     "faultcode" => "Client.ExceptionType",
-                     "faultstring" => "general error message"}
+  @base_fault_json %{
+    "detail" => "detailed error message",
+    "faultcode" => "Client.ExceptionType",
+    "faultstring" => "general error message"
+  }
 
   describe "extract_fault_from_json/1" do
     test "extracts the fault from a standard fault structure" do
@@ -23,8 +25,8 @@ defmodule CatalogApi.FaultTest do
     test "produces a Fault struct from json" do
       fault = Fault.cast(@base_fault_json)
       assert %Fault{} = fault
-      assert fault.detail      == @base_fault_json["detail"]
-      assert fault.faultcode   == @base_fault_json["faultcode"]
+      assert fault.detail == @base_fault_json["detail"]
+      assert fault.faultcode == @base_fault_json["faultcode"]
       assert fault.faultstring == @base_fault_json["faultstring"]
     end
   end

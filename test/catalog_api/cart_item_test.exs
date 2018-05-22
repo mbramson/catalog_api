@@ -3,8 +3,9 @@ defmodule CatalogApi.CartItemTest do
   doctest CatalogApi.CartItem
   alias CatalogApi.CartItem
 
-  @base_item_json %{"cart_price" => "318.24",
-    "catalog_item_id" => 4439324,
+  @base_item_json %{
+    "cart_price" => "318.24",
+    "catalog_item_id" => 4_439_324,
     "catalog_points" => 6365,
     "catalog_price" => "318.24",
     "currency" => "USD",
@@ -16,7 +17,8 @@ defmodule CatalogApi.CartItemTest do
     "points" => 6365,
     "quantity" => 1,
     "retail_price" => "279.99",
-    "shipping_estimate" => "0.00"}
+    "shipping_estimate" => "0.00"
+  }
 
   describe "cast/1" do
     test "produces an Item struct from json" do
@@ -38,8 +40,12 @@ defmodule CatalogApi.CartItemTest do
 
   describe "extract_item_from_json/1" do
     test "extracts an item from the cart_view response structure" do
-      json = %{"cart_view_response" => %{"cart_view_result" =>
-        %{"items" => %{"CartItem" => [@base_item_json, @base_item_json]}}}}
+      json = %{
+        "cart_view_response" => %{
+          "cart_view_result" => %{"items" => %{"CartItem" => [@base_item_json, @base_item_json]}}
+        }
+      }
+
       assert {:ok, [%CartItem{}, %CartItem{}]} = CartItem.extract_items_from_json(json)
     end
 

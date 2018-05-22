@@ -24,11 +24,14 @@ defmodule CatalogApi.Credentials do
       iex> Credentials.creds_for_request("view_cart")
       {"2013-01-01T01:30:00Z", "b93cee9d-dd04-4154-9b5a-8768971e72b8", "VdMhe0wbSyIYeymMm2YvuCmK0vE="}
   """
-  @spec creds_for_request(String.t) ::
-    %{creds_datetime: String.t, creds_uuid: String.t, creds_checksum: String.t}
+  @spec creds_for_request(String.t()) :: %{
+          creds_datetime: String.t(),
+          creds_uuid: String.t(),
+          creds_checksum: String.t()
+        }
   def creds_for_request(method) when is_binary(method) do
     datetime = current_iso_8601_datetime()
-    uuid     = generate_uuid()
+    uuid = generate_uuid()
     checksum = generate_checksum(method, uuid, datetime)
     %{creds_datetime: datetime, creds_uuid: uuid, creds_checksum: checksum}
   end
@@ -41,8 +44,8 @@ defmodule CatalogApi.Credentials do
       "2018-02-05T02:15:00.626526Z"
   """
   def current_iso_8601_datetime do
-    DateTime.utc_now
-    |> DateTime.to_iso8601
+    DateTime.utc_now()
+    |> DateTime.to_iso8601()
   end
 
   @doc """
@@ -69,9 +72,10 @@ defmodule CatalogApi.Credentials do
   """
   def generate_checksum(method_name, uuid, iso_8601_datetime) do
     message = method_name <> uuid <> iso_8601_datetime
+
     case Application.get_env(:catalog_api, :secret_key) do
       nil -> raise "No catalog_api secret_key supplied in configuration"
-      key -> :crypto.hmac(:sha, key, message) |> Base.encode64
+      key -> :crypto.hmac(:sha, key, message) |> Base.encode64()
     end
   end
 end
