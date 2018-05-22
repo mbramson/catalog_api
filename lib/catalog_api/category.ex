@@ -41,16 +41,18 @@ defmodule CatalogApi.Category do
   If the given json is not recognized or is an invalid format then it returns
   an error tuple of the format: `{:error, :unparseable_catalog_api_categories}`
   """
-  @spec extract_categories_from_json(any()) ::
-    {:ok, list(t())}
-    {:error, :unparseable_catalog_api_categories}
-  def extract_categories_from_json(
-    %{"catalog_breakdown_response" =>
-      %{"catalog_breakdown_result" =>
-        %{"categories" =>
-          %{"Category" => categories}}}}) when is_list(categories) do
+  @spec extract_categories_from_json(any()) :: {:ok, list(t())}
+  {:error, :unparseable_catalog_api_categories}
+
+  def extract_categories_from_json(%{
+        "catalog_breakdown_response" => %{
+          "catalog_breakdown_result" => %{"categories" => %{"Category" => categories}}
+        }
+      })
+      when is_list(categories) do
     {:ok, Enum.map(categories, &cast/1)}
   end
+
   def extract_categories_from_json(_), do: {:error, :unparseable_catalog_api_categories}
 
   defp filter_unknown_properties(map) do
@@ -59,12 +61,16 @@ defmodule CatalogApi.Category do
 
   defp to_struct(map), do: struct(Category, map)
 
-  defp cast_child_categories(%Category{children: %{"Category" => raw_child_categories}} = category) do
+  defp cast_child_categories(
+         %Category{children: %{"Category" => raw_child_categories}} = category
+       ) do
     child_categories = raw_child_categories |> Enum.map(&cast/1)
     %{category | children: child_categories}
   end
+
   defp cast_child_categories(%Category{children: %{}} = category) do
     %{category | children: []}
   end
+
   defp cast_child_categories(%Category{} = category), do: category
 end

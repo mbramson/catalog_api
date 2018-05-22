@@ -37,7 +37,8 @@ defmodule CatalogApi.CartItem do
   @spec cast(map()) :: t
   def cast(item_json) when is_map(item_json) do
     item_json
-    |> filter_unknown_properties # To avoid dynamically creating atoms
+    # To avoid dynamically creating atoms
+    |> filter_unknown_properties
     |> Coercion.integer_fields_to_boolean(@boolean_fields)
     |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end)
     |> Enum.into(%{})
@@ -51,19 +52,21 @@ defmodule CatalogApi.CartItem do
   format `{:error, :unparseable_catalog_api_items}`.
   """
   @spec extract_items_from_json(map()) ::
-    {:ok, list(t)}
-    | {:error, :unparseable_catalog_api_items}
-  def extract_items_from_json(
-    %{"cart_view_response" =>
-      %{"cart_view_result" =>
-        %{"items" =>
-          %{"CartItem" => items}}}}) when is_list(items) do
+          {:ok, list(t)}
+          | {:error, :unparseable_catalog_api_items}
+  def extract_items_from_json(%{
+        "cart_view_response" => %{"cart_view_result" => %{"items" => %{"CartItem" => items}}}
+      })
+      when is_list(items) do
     {:ok, Enum.map(items, fn item -> cast(item) end)}
   end
-  def extract_items_from_json(
-    %{"cart_view_response" => %{"cart_view_result" => %{"items" => %{}}}}) do
+
+  def extract_items_from_json(%{
+        "cart_view_response" => %{"cart_view_result" => %{"items" => %{}}}
+      }) do
     {:ok, []}
   end
+
   def extract_items_from_json(_), do: {:error, :unparseable_catalog_api_items}
 
   defp to_struct(map), do: struct(CartItem, map)
