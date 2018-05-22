@@ -3,7 +3,8 @@ defmodule CatalogApi.ItemTest do
   doctest CatalogApi.Item
   alias CatalogApi.Item
 
-  @base_item_json %{"brand" => "cat",
+  @base_item_json %{
+    "brand" => "cat",
     "catalog_item_id" => 123,
     "catalog_price" => "50.00",
     "categories" => %{},
@@ -21,7 +22,8 @@ defmodule CatalogApi.ItemTest do
     "rank" => 300,
     "retail_price" => "80.00",
     "shipping_estimate" => "10.00",
-    "tags" => %{"string" => []}}
+    "tags" => %{"string" => []}
+  }
 
   describe "cast/1" do
     test "produces an Item struct from json" do
@@ -41,8 +43,7 @@ defmodule CatalogApi.ItemTest do
 
     test "coerces to an error value if not coercable to boolean" do
       json = Map.put(@base_item_json, "has_options", 123)
-      assert %Item{has_options: {:error, :failed_boolean_coercion}}
-        = Item.cast(json)
+      assert %Item{has_options: {:error, :failed_boolean_coercion}} = Item.cast(json)
     end
 
     test "does not add invalid keys" do
@@ -72,8 +73,13 @@ defmodule CatalogApi.ItemTest do
 
     test "extracts items from the search_catalog response structure" do
       items = [@base_item_json, @base_item_json]
-      json = %{"search_catalog_response" => %{"search_catalog_result" =>
-        %{"items" => %{"CatalogItem" => items}}}}
+
+      json = %{
+        "search_catalog_response" => %{
+          "search_catalog_result" => %{"items" => %{"CatalogItem" => items}}
+        }
+      }
+
       assert {:ok, [%Item{}, %Item{}]} = Item.extract_items_from_json(json)
     end
 
