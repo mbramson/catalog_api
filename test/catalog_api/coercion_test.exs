@@ -31,8 +31,9 @@ defmodule CatalogApi.CoercionTest do
     test "returns an error tuple for the field if it cannot be coerced" do
       boolean_fields = [:bool]
       map = %{bool: "maybe"}
+
       assert %{bool: {:error, :failed_boolean_coercion}} =
-        Coercion.integer_fields_to_boolean(map, boolean_fields)
+               Coercion.integer_fields_to_boolean(map, boolean_fields)
     end
   end
 
@@ -64,8 +65,9 @@ defmodule CatalogApi.CoercionTest do
     test "returns an error tuple for the field if it cannot be coerced" do
       boolean_fields = [:bool]
       map = %{bool: "maybe"}
+
       assert %{bool: {:error, :failed_integer_coercion}} =
-        Coercion.boolean_fields_to_integer(map, boolean_fields)
+               Coercion.boolean_fields_to_integer(map, boolean_fields)
     end
   end
 end

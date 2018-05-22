@@ -3,19 +3,23 @@ defmodule CatalogApi.CategoryTest do
 
   alias CatalogApi.Category
 
-  @base_category_json %{"category_id" => 123,
+  @base_category_json %{
+    "category_id" => 123,
     "children" => %{"Category" => []},
     "depth" => 2,
     "item_count" => 99,
     "name" => "video games",
-    "parent_category_id" => 0}
+    "parent_category_id" => 0
+  }
 
-  @other_category_json %{"category_id" => 456,
+  @other_category_json %{
+    "category_id" => 456,
     "children" => %{"Category" => []},
     "depth" => 5,
     "item_count" => 50,
     "name" => "strategy games",
-    "parent_category_id" => 123}
+    "parent_category_id" => 123
+  }
 
   describe "cast/1" do
     test "produces a category struct from json" do
@@ -70,10 +74,12 @@ defmodule CatalogApi.CategoryTest do
 
   describe "extract_items_from_json/1" do
     test "extracts a cetegory from the catalog_breakdown response" do
-      json = %{"catalog_breakdown_response" =>
-        %{"catalog_breakdown_result" =>
-          %{"categories" =>
-            %{"Category" => [@base_category_json]}}}}
+      json = %{
+        "catalog_breakdown_response" => %{
+          "catalog_breakdown_result" => %{"categories" => %{"Category" => [@base_category_json]}}
+        }
+      }
+
       assert {:ok, [category]} = Category.extract_categories_from_json(json)
       assert %Category{} = category
       assert category.category_id == 123
@@ -86,9 +92,7 @@ defmodule CatalogApi.CategoryTest do
 
     test "returns an error tuple if structure is not parseable" do
       assert {:error, :unparseable_catalog_api_categories} =
-        Category.extract_categories_from_json(%{})
-
+               Category.extract_categories_from_json(%{})
     end
-
   end
 end
