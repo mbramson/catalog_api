@@ -51,6 +51,17 @@ defmodule CatalogApi.ItemTest do
       refute Map.get(result, :bad_param)
       refute Map.get(result, "bad_param")
     end
+
+    test "casts categories to a list" do
+      item = Item.cast(@base_item_json)
+      assert %Item{} = item
+      assert item.categories == []
+
+      item_json = @base_item_json |> Map.put("categories", %{"integer" => [1, 2, 3]})
+      item = Item.cast(item_json)
+      assert %Item{} = item
+      assert item.categories == [1, 2, 3]
+    end
   end
 
   describe "extract_item_from_json/1" do

@@ -10,7 +10,7 @@ defmodule CatalogApi.Item do
   defstruct brand: nil,
             catalog_item_id: nil,
             catalog_price: nil,
-            categories: %{}, # TODO Can default be more specific?
+            categories: [],
             currency: nil,
             description: nil,
             has_options: false,
@@ -44,6 +44,7 @@ defmodule CatalogApi.Item do
     |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end)
     |> Enum.into(%{})
     |> to_struct
+    |> cast_categories
   end
 
   def extract_items_from_json(
@@ -61,9 +62,15 @@ defmodule CatalogApi.Item do
   end
   def extract_items_from_json(_), do: {:error, :unparseable_catalog_api_items}
 
-  defp to_struct(map), do: struct(Item, map)
-
   defp filter_unknown_properties(map) do
     Enum.filter(map, fn {k, _v} -> k in @valid_fields end)
   end
+
+  defp to_struct(map), do: struct(Item, map)
+
+  defp cast_categories(%{categories: %{"integer" => categories}} = item) when is_list(categories) do
+    %{item | categories: categories}
+  end
+  defp cast_categories(item), do: %{item | categories: []}
+
 end
