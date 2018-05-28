@@ -281,22 +281,57 @@ defmodule CatalogApi do
        }) do
     {:ok, description}
   end
+  defp extract_description(%{
+         "cart_remove_item_response" => %{
+           "cart_remove_item_result" => %{"description" => description}
+         }
+       }) do
+    {:ok, description}
+  end
 
   defp extract_description(_), do: {:error, :unparseable_response_description}
 
-  def cart_remove_item(socket_id, external_user_id, catalog_item_id, option_id, quantity) do
-    # TODO make quantity optional, as it default to current quantity
-    # TODO add option_id to optional params
-    params = %{
+  @doc """
+  Removes the specified item from the user's cart.
+
+  Optional parameters include:
+
+  - `option_id`: If there are multiple versions of a single item id with
+    different options, this can be used to only remove items with the given
+    option.
+  - `quantity`: The quantity of the given item to remove. If this is not
+    specified, then all items of this type are removed from the cart.
+
+  If the item doesn't actually exist or was not in the given user's cart then
+  this still returns a response indicating that the operation was successful.
+  This is a behavior of the CatalogAPI API itself and not specific to this
+  `CatalogApi` library.
+
+  ## Example
+
+      iex> CatalogApi.cart_remove_item(1061, 200, 123456)
+      {:ok, %{description: "Item quantity decreased."}}
+  """
+  def cart_remove_item(socket_id, external_user_id, catalog_item_id, opts \\ []) do
+    allowed = [:option_id, :quantity]
+    {:ok, optional_params} = filter_optional_params([], opts, allowed)
+
+    required_params = %{
       socket_id: socket_id,
       external_user_id: external_user_id,
-      catalog_item_id: catalog_item_id,
-      option_id: option_id,
-      quantity: quantity
+      catalog_item_id: catalog_item_id
     }
 
+    params = Map.merge(optional_params, required_params)
+
     url = Url.url_for("cart_remove_item", params)
-    HTTPoison.get(url)
+
+    with {:ok, response} <- HTTPoison.get(url),
+         :ok <- Error.validate_response_status(response),
+         {:ok, json} <- parse_json(response.body),
+         {:ok, description} <- extract_description(json) do
+      {:ok, %{description: description}}
+    end
   end
 
   def cart_empty(socket_id, external_user_id) do
