@@ -1,0 +1,13 @@
+{
+  "cart_remove_item_response": {
+    "cart_remove_item_result": {
+      "credentials": {
+        "checksum": "f1ht0adfdhO4xxjT0vDQamUUWWw=",
+        "method": "cart_remove_item",
+        "uuid": "59c0c088-a123-43f3-aaa4-caccfa39a837",
+        "datetime":"2018-05-28T18:25:39.288651+00:00"
+      },
+      "description": "Item quantity decreased."
+    }
+  }
+}

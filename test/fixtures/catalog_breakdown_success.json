@@ -1,1 +1,54 @@
-{"catalog_breakdown_response":{"catalog_breakdown_result":{"socket":{"socket_name":"API Master","socket_id":999,"region":"?","point_to_currency_ratio":"20.00","language":"?","currency":"?"},"credentials":{"uuid":"b4287b9d-7253-49b1-992f-375a0ee2b4f2","method":"catalog_breakdown","datetime":"2018-05-03T00:01:06.026012+00:00","checksum":"Dp6H09qCaVrG7FMCtl0/eZ68HdM="},"categories":{"Category":[{"parent_category_id":0,"name":"Automotive","item_count":"67","depth":0,"children":{"Category":[{"parent_category_id":"99","name":"Car Care","item_count":"20","depth":1,"children":{"Category":[]},"category_id":"2577"},{"parent_category_id":"99","name":"Tools & Equipment","item_count":"37","depth":1,"children":{"Category":[]},"category_id":"2583"}]},"category_id":"99"}]}}}}
+{
+  "catalog_breakdown_response":{
+    "catalog_breakdown_result":{
+      "socket":{
+        "socket_name":"API Master",
+        "socket_id":999,
+        "region":"?",
+        "point_to_currency_ratio":"20.00",
+        "language":"?",
+        "currency":"?"
+      },
+      "credentials":{
+        "uuid":"b4287b9d-7253-49b1-992f-375a0ee2b4f2",
+        "method":"catalog_breakdown",
+        "datetime":"2018-05-03T00:01:06.026012+00:00",
+        "checksum":"Dp6H09qCaVrG7FMCtl0/eZ68HdM="},
+        "categories":{
+          "Category":[
+            {
+              "parent_category_id":0,
+              "name":"Automotive",
+              "item_count":"67",
+              "depth":0,
+              "children":{
+                "Category":[
+                  {
+                    "parent_category_id":"99",
+                    "name":"Car Care",
+                    "item_count":"20",
+                    "depth":1,
+                    "children": {
+                      "Category":[]
+                    },
+                    "category_id":"2577"
+                  },
+                  {
+                    "parent_category_id":"99",
+                    "name":"Tools & Equipment",
+                    "item_count":"37",
+                    "depth":1,
+                    "children":{
+                      "Category":[]
+                    },
+                    "category_id":"2583"
+                  }
+                ]
+              },
+              "category_id":"99"
+            }
+          ]
+        }
+    }
+  }
+}
