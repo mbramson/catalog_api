@@ -103,14 +103,14 @@ defmodule CatalogApi do
     - `"points desc"` - Will return items worth the most points first.
     - `"points asc"` - Will return items worth the least points first.
     - `"rank asc"`: Will return items with the most popular ones first.
-    - `"score desc"` (default): Will return items with the the most relevant
+    - `"score desc"` (default): Will return items with the the most relevant.
       ones first.  Sorting by score only makes sense when you are searching with
       the "name" or "search" arguments.
     - `"random asc"`: Will return the items in random order.
   - `catalog_item_ids`: Accepts an array of items. Matches only items that ar
-    in the given list
+    in the given list.
   """
-  @spec search_catalog(integer(), map()) ::
+  @spec search_catalog(integer(), map() | Keyword.t()) ::
           {:ok, %{items: Item.t(), page_info: map()}}
           | {:error, {:bad_status, integer()}}
           | {:error, {:catalog_api_fault, Error.extracted_fault()}}
