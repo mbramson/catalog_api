@@ -196,7 +196,7 @@ defmodule CatalogApi do
           | {:error, {:catalog_api_fault, Error.extracted_fault()}}
           | {:error, Poison.ParseError.t()}
           | {:error, :unparseable_response_description}
-  def cart_set_address(socket_id, external_user_id, address = %Address{}) do
+  def cart_set_address(socket_id, external_user_id, %Address{} = address) do
     address_params = Map.from_struct(address)
     cart_set_address(socket_id, external_user_id, address_params)
   end
@@ -613,7 +613,9 @@ defmodule CatalogApi do
   """
   def order_list(external_user_id, opts \\ []) do
     defaults = [per_page: 10, page: 1]
-    %{per_page: per_page, page: page} = Keyword.merge(defaults, opts) |> Enum.into(%{})
+    %{per_page: per_page, page: page} = defaults 
+                                        |> Keyword.merge(opts) 
+                                        |> Enum.into(%{})
 
     # TODO: validate that per_page is at most 50.
 

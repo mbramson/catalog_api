@@ -1,4 +1,6 @@
 defmodule CatalogApi.FormatHelper do
+  @moduledoc false
+
   def is_iso8601_datetime_string(datetime) when is_binary(datetime) do
     case datetime do
       <<_year::bytes-size(4)>> <>

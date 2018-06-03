@@ -1,4 +1,6 @@
 defmodule CatalogApi.FixtureHelper do
+  @moduledoc false
+
   @response_headers [
     {"Access-Control-Allow-Methods", "GET"},
     {"Access-Control-Allow-Origin", "*"},
@@ -19,7 +21,7 @@ defmodule CatalogApi.FixtureHelper do
   end
 
   def retrieve_json_fixture(fixture_name) do
-    retrieve_fixture("#{fixture_name}.json") |> Poison.decode!()
+    "#{fixture_name}.json" |> retrieve_fixture |> Poison.decode!()
   end
 
   def retrieve_json_response(fixture_name, status_code \\ 200) do
