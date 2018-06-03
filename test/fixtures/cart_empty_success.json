@@ -1,0 +1,13 @@
+{
+  "cart_empty_response": {
+    "cart_empty_result": {
+      "credentials": {
+        "checksum": "Q1flLAHJFELphzpiipG4K+2GpWg=",
+        "method": "cart_empty",
+        "uuid": "67fd2eed-4b89-4d7f-ae7b-6ff77eea3d1e",
+        "datetime": "2018-06-03T18:48:52.035789+00:00"
+      },
+      "description": "Cart emptied."
+    }
+  }
+}

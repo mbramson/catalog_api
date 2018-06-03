@@ -273,7 +273,6 @@ defmodule CatalogApi do
        }) do
     {:ok, description}
   end
-
   defp extract_description(%{
          "cart_set_address_response" => %{
            "cart_set_address_result" => %{"description" => description}
@@ -289,6 +288,13 @@ defmodule CatalogApi do
     {:ok, description}
   end
 
+  defp extract_description(%{
+         "cart_empty_response" => %{
+           "cart_empty_result" => %{"description" => description}
+         }
+       }) do
+    {:ok, description}
+  end
   defp extract_description(_), do: {:error, :unparseable_response_description}
 
   @doc """
@@ -337,7 +343,12 @@ defmodule CatalogApi do
   def cart_empty(socket_id, external_user_id) do
     params = %{socket_id: socket_id, external_user_id: external_user_id}
     url = Url.url_for("cart_empty", params)
-    HTTPoison.get(url)
+    with {:ok, response} <- HTTPoison.get(url),
+         :ok <- Error.validate_response_status(response),
+         {:ok, json} <- parse_json(response.body),
+         {:ok, description} <- extract_description(json) do
+      {:ok, %{description: description}}
+    end
   end
 
   @doc """
