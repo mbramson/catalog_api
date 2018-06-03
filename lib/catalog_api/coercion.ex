@@ -15,9 +15,10 @@ defmodule CatalogApi.Coercion do
   @spec coerce_to_boolean_if_needed(String.t() | atom(), any(), list(String.t() | atom())) ::
           {String.t(), any()}
   defp coerce_to_boolean_if_needed(key, value, boolean_fields) do
-    cond do
-      key in boolean_fields -> {key, coerce_integer_to_boolean(value)}
-      true -> {key, value}
+    if key in boolean_fields do
+      {key, coerce_integer_to_boolean(value)}
+    else
+      {key, value}
     end
   end
 
@@ -42,9 +43,10 @@ defmodule CatalogApi.Coercion do
   @spec coerce_to_integer_if_needed(String.t() | atom(), any(), list(Strin.t() | atom())) ::
           {String.t(), any()}
   defp coerce_to_integer_if_needed(key, value, boolean_fields) do
-    cond do
-      key in boolean_fields -> {key, coerce_boolean_to_integer(value)}
-      true -> {key, value}
+    if key in boolean_fields do
+      {key, coerce_boolean_to_integer(value)}
+    else
+      {key, value}
     end
   end
 

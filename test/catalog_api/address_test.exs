@@ -57,7 +57,8 @@ defmodule CatalogApi.AddressTest do
 
     test "returns :ok for valid address params when params have mixed keys" do
       params =
-        Map.put(@valid_address_params, :city, "Cleveland")
+        @valid_address_params
+        |> Map.put(:city, "Cleveland")
         |> Map.delete("city")
 
       assert :ok = Address.validate_params(params)

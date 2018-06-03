@@ -313,12 +313,10 @@ defmodule CatalogApi.Address do
   def validate_field(_field, _value), do: %{}
 
   defp validate_field_length(field, value, max_length) when is_binary(value) do
-    cond do
-      String.length(value) > max_length ->
-        %{field => ["cannot be longer than #{max_length} characters"]}
-
-      true ->
-        %{}
+    if String.length(value) > max_length do
+      %{field => ["cannot be longer than #{max_length} characters"]}
+    else
+      %{}
     end
   end
 end
