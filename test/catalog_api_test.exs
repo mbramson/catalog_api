@@ -205,6 +205,30 @@ defmodule CatalogApiTest do
     end
   end
 
+  describe "cart_empty/2" do
+    test "returns a message if the response is successful" do
+      response_fixture = FixtureHelper.retrieve_json_response("cart_empty_success")
+      with_mock HTTPoison, get: fn _url -> {:ok, response_fixture} end do
+        response = CatalogApi.cart_empty(123, 500)
+        assert {:ok, %{description: _}} = response
+      end
+    end
+
+    test "returns an error tuple with a fault struct when CatalogApi responds with a fault" do
+      with_mock HTTPoison, get: fn _url -> {:ok, @fault_response} end do
+        response = CatalogApi.cart_empty(123, 500)
+        assert {:error, {:catalog_api_fault, %Fault{}}} = response
+      end
+    end
+
+    test "returns an error tuple when CatalogApi responds with an internal server error" do
+      with_mock HTTPoison, get: fn _url -> {:ok, @internal_error_response} end do
+        response = CatalogApi.cart_empty(123, 500)
+        assert {:error, {:bad_catalog_api_status, 500}} = response
+      end
+    end
+  end
+
   describe "cart_view/2" do
     test "returns items in cart and the cart status for a successful response" do
       with_mock HTTPoison, get: fn _url -> {:ok, Fixture.cart_view_success()} end do
