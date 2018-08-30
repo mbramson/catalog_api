@@ -10,6 +10,7 @@ defmodule CatalogApiTest do
   alias CatalogApi.Fixture
   alias CatalogApi.FixtureHelper
   alias CatalogApi.Item
+  alias CatalogApi.Order
 
   @response_headers [
     {"Access-Control-Allow-Methods", "GET"},
@@ -294,7 +295,8 @@ defmodule CatalogApiTest do
     test "returns order information if order is successfully placed" do
       with_mock HTTPoison, get: fn _url -> {:ok, Fixture.cart_order_place_success()} end do
         response = CatalogApi.cart_order_place(1061, 1)
-        assert {:ok, _json} = response
+        assert {:ok, %Order{} = order} = response
+        refute is_nil(order.order_id)
       end
     end
 
