@@ -10,6 +10,7 @@ defmodule CatalogApi do
   alias CatalogApi.Error
   alias CatalogApi.Fault
   alias CatalogApi.Item
+  alias CatalogApi.Order
   alias CatalogApi.Url
 
   # TODO add param validation
@@ -548,7 +549,7 @@ defmodule CatalogApi do
   state of the cart to be,
   """
   @spec cart_order_place(integer(), integer(), Keyword.t()) ::
-          {:ok, map()}
+          {:ok, Order.t()}
           | {:error, :cart_not_found}
           | {:error, :no_shipping_address}
           | {:error, :stale_cart_version}
@@ -566,8 +567,9 @@ defmodule CatalogApi do
 
     with {:ok, response} <- HTTPoison.get(url),
          :ok <- Error.validate_response_status(response),
-         {:ok, json} <- parse_json(response.body) do
-      {:ok, json}
+         {:ok, json} <- parse_json(response.body),
+         {:ok, order} <- Order.extract_from_json(json) do
+      {:ok, order}
     else
       {:error, {:catalog_api_fault, %Fault{faultstring: "Cart not found."}}} ->
         {:error, :cart_not_found}
