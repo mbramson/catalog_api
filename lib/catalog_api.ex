@@ -115,7 +115,7 @@ defmodule CatalogApi do
           {:ok, %{items: Item.t(), page_info: map()}}
           | {:error, {:bad_status, integer()}}
           | {:error, {:catalog_api_fault, Error.extracted_fault()}}
-          | {:error, Poison.ParseError.t()}
+          | {:error, Jason.DecodeError.t()}
   def search_catalog(socket_id, opts \\ %{}) do
     required_params = %{socket_id: socket_id}
     params = merge_required_filter_invalid(opts, required_params, @valid_search_catalog_keys)
@@ -155,7 +155,7 @@ defmodule CatalogApi do
           {:ok, %{item: Item.t()}}
           | {:error, {:bad_status, integer()}}
           | {:error, {:catalog_api_fault, Error.extracted_fault()}}
-          | {:error, Poison.ParseError.t()}
+          | {:error, Jason.DecodeError.t()}
           | {:error, :item_not_found}
   def view_item(socket_id, catalog_item_id) do
     params = %{socket_id: socket_id, catalog_item_id: catalog_item_id}
@@ -195,7 +195,7 @@ defmodule CatalogApi do
           | {:error, Address.invalid_address_error()}
           | {:error, {:bad_status, integer()}}
           | {:error, {:catalog_api_fault, Error.extracted_fault()}}
-          | {:error, Poison.ParseError.t()}
+          | {:error, Jason.DecodeError.t()}
           | {:error, :unparseable_response_description}
   def cart_set_address(socket_id, external_user_id, %Address{} = address) do
     address_params = Map.from_struct(address)
@@ -555,7 +555,7 @@ defmodule CatalogApi do
           | {:error, :stale_cart_version}
           | {:error, {:bad_status, integer()}}
           | {:error, {:catalog_api_fault, Error.extracted_fault()}}
-          | {:error, Poison.ParseError.t()}
+          | {:error, Jason.DecodeError.t()}
   def cart_order_place(socket_id, external_user_id, opts \\ []) do
     allowed = [:cart_version]
     {:ok, optional_params} = filter_optional_params([], opts, allowed)
@@ -627,8 +627,10 @@ defmodule CatalogApi do
     HTTPoison.get(url)
   end
 
+  @spec parse_json(iodata()) ::
+    {:ok, term()} | {:error, Jason.DecodeError.t()}
   defp parse_json(json) do
-    Poison.decode(json)
+    Jason.decode(json)
   end
 
   defp merge_required_filter_invalid(opts, required, valid_keys) do
