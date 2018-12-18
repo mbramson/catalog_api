@@ -6,6 +6,7 @@ defmodule CatalogApi.Category do
 
   alias CatalogApi.Category
 
+  @derive Jason.Encoder
   defstruct category_id: nil,
             children: [],
             depth: 1,

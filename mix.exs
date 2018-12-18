@@ -4,7 +4,7 @@ defmodule CatalogApi.Mixfile do
   def project do
     [
       app: :catalog_api,
-      version: "0.0.14",
+      version: "0.0.15",
       elixir: "~> 1.3",
       elixirc_paths: elixirc_paths(Mix.env),
       build_embedded: Mix.env == :prod,
@@ -30,8 +30,9 @@ defmodule CatalogApi.Mixfile do
       {:credo, "~> 0.9.1", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
       {:httpoison, "~> 1.0"},
+      {:jason, "~> 1.1.2"},
+      {:mix_test_watch, "~> 0.6", only: :dev, runtime: false},
       {:mock, "~> 0.3.0", only: :test},
-      {:poison, "~> 3.1"},
       {:quixir, "~> 0.9", only: :test },
       {:uuid, "~> 1.1" },
     ]

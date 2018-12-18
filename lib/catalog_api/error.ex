@@ -20,12 +20,12 @@ defmodule CatalogApi.Error do
 
   @type extracted_fault ::
           Fault.t()
-          | {:error, Poison.ParseError.t()}
+          | {:error, Jason.DecodeError.t()}
           | {:error, :unparseable_catalog_api_fault}
 
   @spec extract_fault(Response.t()) :: extracted_fault
   defp extract_fault(%Response{} = response) do
-    with {:ok, parsed} <- Poison.decode(response.body),
+    with {:ok, parsed} <- Jason.decode(response.body),
          {:ok, fault} <- Fault.extract_fault_from_json(parsed) do
       fault
     end

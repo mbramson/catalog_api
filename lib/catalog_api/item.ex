@@ -7,6 +7,7 @@ defmodule CatalogApi.Item do
   alias CatalogApi.Coercion
   alias CatalogApi.Item
 
+  @derive Jason.Encoder
   defstruct brand: nil,
             catalog_item_id: nil,
             catalog_price: nil,
