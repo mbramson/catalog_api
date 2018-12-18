@@ -26,6 +26,7 @@ defmodule CatalogApi.Address do
   alias CatalogApi.Address.Iso3166
   alias CatalogApi.StructHelper
 
+  @derive Jason.Encoder
   defstruct first_name: "",
             last_name: "",
             address_1: "",

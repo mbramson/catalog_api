@@ -7,6 +7,7 @@ defmodule CatalogApi.Fault do
   alias CatalogApi.Fault
   alias CatalogApi.StructHelper
 
+  @derive Jason.Encoder
   defstruct detail: "", faultcode: "", faultstring: ""
 
   @type t :: %Fault{detail: String.t(), faultcode: String.t(), faultstring: String.t()}

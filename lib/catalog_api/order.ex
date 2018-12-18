@@ -3,6 +3,8 @@ defmodule CatalogApi.Order do
   Defines the `CatalogApi.Order` struct and associated functions for dealing
   with orders in CatalogAPI responses.
   """
+
+  @derive Jason.Encoder
   defstruct order_id: nil
 
   alias __MODULE__
