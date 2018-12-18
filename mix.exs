@@ -33,7 +33,6 @@ defmodule CatalogApi.Mixfile do
       {:jason, "~> 1.1.2"},
       {:mix_test_watch, "~> 0.6", only: :dev, runtime: false},
       {:mock, "~> 0.3.0", only: :test},
-      {:poison, "~> 3.1"},
       {:quixir, "~> 0.9", only: :test },
       {:uuid, "~> 1.1" },
     ]

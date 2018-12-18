@@ -21,7 +21,7 @@ defmodule CatalogApi.FixtureHelper do
   end
 
   def retrieve_json_fixture(fixture_name) do
-    "#{fixture_name}.json" |> retrieve_fixture |> Poison.decode!()
+    "#{fixture_name}.json" |> retrieve_fixture |> Jason.decode!()
   end
 
   def retrieve_json_response(fixture_name, status_code \\ 200) do
