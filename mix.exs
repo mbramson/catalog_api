@@ -4,7 +4,7 @@ defmodule CatalogApi.Mixfile do
   def project do
     [
       app: :catalog_api,
-      version: "0.0.16",
+      version: "0.0.17",
       elixir: "~> 1.3",
       elixirc_paths: elixirc_paths(Mix.env),
       build_embedded: Mix.env == :prod,
@@ -27,7 +27,7 @@ defmodule CatalogApi.Mixfile do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:credo, "~> 0.9.1", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.19.0", only: :dev, runtime: false},
       {:httpoison, "~> 1.0"},
       {:jason, "~> 1.1"},
